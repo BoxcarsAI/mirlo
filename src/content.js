@@ -20,6 +20,7 @@
   let mirloActive = false;
   let activationToastEl = null;
   let activationDismissTimer = null;
+  const MARKER_TEXT = "·";
 
   function getHtmlLanguage() {
     const docLang = document.documentElement?.lang?.trim();
@@ -314,6 +315,16 @@
     translatingParagraph = null;
   }
 
+  function appendMarker(paragraph) {
+    if (!paragraph) return;
+    const existing = paragraph.querySelector(".mirlo-marker");
+    if (existing) existing.remove();
+    const marker = document.createElement("span");
+    marker.className = "mirlo-marker";
+    marker.textContent = MARKER_TEXT;
+    paragraph.appendChild(marker);
+  }
+
   function applyTranslatedText(paragraph, translated, sourceLanguage, targetLanguage) {
     paragraph.dataset.mirloOriginal = paragraph.dataset.mirloOriginal || getParagraphText(paragraph);
     paragraph.dataset.mirloTranslated = translated;
@@ -322,7 +333,8 @@
     paragraph.classList.add("mirlo-translated");
     paragraph.classList.remove("mirlo-reverted");
     paragraph.dataset.mirloState = "translated";
-    paragraph.innerText = translated;
+    paragraph.textContent = translated;
+    appendMarker(paragraph);
     attachTooltipHandlers(paragraph);
     translatedParagraph = paragraph;
   }
@@ -331,7 +343,7 @@
     if (!paragraph) return;
     const original = paragraph.dataset.mirloOriginal;
     if (!original) return;
-    paragraph.innerText = original;
+    paragraph.textContent = original;
     paragraph.dataset.mirloState = "original";
     paragraph.classList.add("mirlo-reverted");
     paragraph.classList.remove("mirlo-translated");
@@ -531,7 +543,7 @@
   function toggleParagraphState(paragraph) {
     const state = paragraph.dataset.mirloState || "translated";
     if (state === "translated") {
-      paragraph.innerText = paragraph.dataset.mirloOriginal || "";
+      paragraph.textContent = paragraph.dataset.mirloOriginal || "";
       paragraph.dataset.mirloState = "original";
       paragraph.classList.add("mirlo-reverted");
       paragraph.classList.remove("mirlo-translated");
@@ -542,7 +554,8 @@
       if (translatedParagraph && translatedParagraph !== paragraph) {
         revertParagraph(translatedParagraph);
       }
-      paragraph.innerText = paragraph.dataset.mirloTranslated || "";
+      paragraph.textContent = paragraph.dataset.mirloTranslated || "";
+      appendMarker(paragraph);
       paragraph.dataset.mirloState = "translated";
       paragraph.classList.remove("mirlo-reverted");
       paragraph.classList.add("mirlo-translated");
