@@ -229,7 +229,7 @@ Eventually we want to replace the globe with a custom mirlo (blackbird) icon. Fo
 
 ---
 
-## MIRLO-005: Smarter Paragraph Eligibility
+## MIRLO-005: Smarter Paragraph Eligibility COMPLETED
 
 **Priority:** P1 (Important)
 **Estimated Complexity:** Medium
@@ -295,7 +295,7 @@ function isVisibleElement(element) {
 
 ---
 
-## MIRLO-006: Update Popup for Site Management
+## MIRLO-006: Update Popup for Site Management - COMPLETED
 
 **Priority:** P2 (Nice to Have)
 **Estimated Complexity:** Medium

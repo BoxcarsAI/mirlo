@@ -49,6 +49,7 @@
   let translatingParagraph = null;
   let translationRequestId = 0;
   let mirloActive = false;
+  let listenersBound = false;
   let activationToastEl = null;
   let activationDismissTimer = null;
   const MARKER_TEXT = "·";
@@ -616,16 +617,30 @@
     if (mirloActive) return;
     mirloActive = true;
     logAiStatus();
-    document.addEventListener("mouseover", (event) => {
-      handleParagraphHover(event.target);
-    });
-    document.addEventListener("mouseout", (event) => {
-      const related = event.relatedTarget;
-      if (related && badgeEl && badgeEl.contains(related)) return;
-      if (!activeParagraph || !activeParagraph.contains(related)) {
-        hideBadge();
-      }
-    });
+    if (!listenersBound) {
+      listenersBound = true;
+      document.addEventListener("mouseover", (event) => {
+        if (!mirloActive) return;
+        handleParagraphHover(event.target);
+      });
+      document.addEventListener("mouseout", (event) => {
+        if (!mirloActive) return;
+        const related = event.relatedTarget;
+        if (related && badgeEl && badgeEl.contains(related)) return;
+        if (!activeParagraph || !activeParagraph.contains(related)) {
+          hideBadge();
+        }
+      });
+    }
+  }
+
+  function deactivateMirlo() {
+    if (!mirloActive) return;
+    mirloActive = false;
+    activeParagraph = null;
+    cancelInFlightTranslation();
+    hideBadge();
+    hideTooltip();
   }
 
   function removeActivationToast() {
@@ -711,14 +726,25 @@
   }
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message?.type !== "mirlo:getLanguageInfo") return;
-    getPageLanguageInfo()
-      .then(sendResponse)
-      .catch((error) => {
-        sendResponse({
-          error: error?.name || error?.message || "unknown-error"
+    if (message?.type === "mirlo:getLanguageInfo") {
+      getPageLanguageInfo()
+        .then(sendResponse)
+        .catch((error) => {
+          sendResponse({
+            error: error?.name || error?.message || "unknown-error"
+          });
         });
-      });
-    return true;
+      return true;
+    }
+    if (message?.type === "mirlo:setActive") {
+      if (message?.enabled) {
+        removeActivationToast();
+        activateMirlo();
+      } else {
+        deactivateMirlo();
+      }
+      sendResponse({ active: mirloActive });
+      return;
+    }
   });
 })();
