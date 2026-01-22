@@ -1,13 +1,8 @@
 (() => {
-  const TARGET_WORD = "the";
-  const MAX_HIGHLIGHTS = 5;
-  const HIGHLIGHT_CLASS = "peli-can-highlight";
   const SKIP_SELECTORS =
     "script,style,textarea,code,pre,svg,math,head,title,input,option,select,button";
   const TRANSLATE_TARGET_LANGUAGE = "es";
 
-  let highlights = 0;
-  let scheduled = false;
   let tooltipEl = null;
   let tooltipPinned = false;
   let tooltipHideTimer = null;
@@ -462,80 +457,12 @@
   function shouldSkipNode(node) {
     if (!node || !node.parentElement) return true;
     if (node.parentElement.closest(SKIP_SELECTORS)) return true;
-    if (node.parentElement.closest(`.${HIGHLIGHT_CLASS}`)) return true;
     if (!node.nodeValue || !node.nodeValue.trim()) return true;
     return false;
   }
 
-  function highlightTextNode(node) {
-    if (highlights >= MAX_HIGHLIGHTS) return;
-
-    const text = node.nodeValue;
-    const regex = new RegExp(`\\b${TARGET_WORD}\\b`, "gi");
-    let match = null;
-    let lastIndex = 0;
-    let matched = false;
-    const fragment = document.createDocumentFragment();
-
-    while ((match = regex.exec(text)) && highlights < MAX_HIGHLIGHTS) {
-      matched = true;
-      const before = text.slice(lastIndex, match.index);
-      if (before) fragment.append(document.createTextNode(before));
-
-      const span = document.createElement("span");
-      span.className = HIGHLIGHT_CLASS;
-      span.textContent = match[0];
-      fragment.append(span);
-
-      highlights += 1;
-      lastIndex = match.index + match[0].length;
-    }
-
-    if (!matched) return;
-
-    const after = text.slice(lastIndex);
-    if (after) fragment.append(document.createTextNode(after));
-
-    node.parentNode.replaceChild(fragment, node);
-  }
-
-  function scanAndHighlight() {
-    if (!document.body || highlights >= MAX_HIGHLIGHTS) return;
-
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode(node) {
-          return shouldSkipNode(node)
-            ? NodeFilter.FILTER_REJECT
-            : NodeFilter.FILTER_ACCEPT;
-        }
-      }
-    );
-
-    const nodes = [];
-    let current = walker.nextNode();
-    while (current && highlights < MAX_HIGHLIGHTS) {
-      nodes.push(current);
-      current = walker.nextNode();
-    }
-
-    nodes.forEach(highlightTextNode);
-  }
-
-  function scheduleScan() {
-    if (scheduled) return;
-    scheduled = true;
-    window.setTimeout(() => {
-      scheduled = false;
-      scanAndHighlight();
-    }, 200);
-  }
-
   function init() {
     logAiStatus();
-    scheduleScan();
     ensureStatus();
     setStatus("Checking…");
     maybeTranslateParagraph();
@@ -550,16 +477,6 @@
       }
     });
 
-    const observer = new MutationObserver(() => {
-      if (highlights >= MAX_HIGHLIGHTS) return;
-      scheduleScan();
-    });
-
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
   }
 
   if (document.readyState === "loading") {
