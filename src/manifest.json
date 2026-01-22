@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Mirlo",
+  "version": "0.1.0",
+  "description": "Privacy-first language learning highlights.",
+  "action": {
+    "default_title": "Mirlo",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

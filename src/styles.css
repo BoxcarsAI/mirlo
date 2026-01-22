@@ -1,0 +1,83 @@
+.peli-can-highlight {
+  background-color: yellow;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.mirlo-translated {
+  background-color: #f6f2e7;
+  box-shadow: inset 0 0 0 1px #e9e1cf;
+  border-radius: 6px;
+  padding: 4px 6px;
+  position: relative;
+  transition: background-color 120ms ease-in-out, box-shadow 120ms ease-in-out;
+}
+
+.mirlo-translated:hover {
+  background-color: #f0eadc;
+  box-shadow: inset 0 0 0 1px #e2d6bf;
+}
+
+.mirlo-translated.mirlo-reverted {
+  background-color: #f9f6ef;
+  box-shadow: inset 0 0 0 1px #e6dfd2;
+}
+
+.mirlo-tooltip {
+  position: absolute;
+  z-index: 2147483647;
+  min-width: 220px;
+  max-width: 360px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  padding: 10px 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.mirlo-tooltip.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.mirlo-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.mirlo-tooltip-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mirlo-tooltip-button {
+  border: none;
+  background: #0f766e;
+  color: #f8fafc;
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.mirlo-tooltip-button:hover {
+  background: #0b5c55;
+}
+
+.mirlo-tooltip-body {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #1f2937;
+  white-space: pre-wrap;
+}
