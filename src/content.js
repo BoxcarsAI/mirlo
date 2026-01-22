@@ -8,7 +8,6 @@
 
   let highlights = 0;
   let scheduled = false;
-  let translationAttempted = false;
   let tooltipEl = null;
   let tooltipPinned = false;
   let tooltipHideTimer = null;
@@ -16,6 +15,9 @@
   let translationStart = null;
   let badgeEl = null;
   let activeParagraph = null;
+  let translatedParagraph = null;
+  let translatingParagraph = null;
+  let translationRequestId = 0;
 
   function getHtmlLanguage() {
     const docLang = document.documentElement?.lang?.trim();
@@ -176,9 +178,51 @@
     return true;
   }
 
+  function cancelInFlightTranslation() {
+    translationRequestId += 1;
+    translatingParagraph = null;
+  }
+
+  function applyTranslatedText(paragraph, translated, sourceLanguage, targetLanguage) {
+    paragraph.dataset.mirloOriginal = paragraph.dataset.mirloOriginal || getParagraphText(paragraph);
+    paragraph.dataset.mirloTranslated = translated;
+    paragraph.dataset.mirloSource = sourceLanguage;
+    paragraph.dataset.mirloTarget = targetLanguage;
+    paragraph.classList.add("mirlo-translated");
+    paragraph.classList.remove("mirlo-reverted");
+    paragraph.dataset.mirloState = "translated";
+    paragraph.innerText = translated;
+    attachTooltipHandlers(paragraph);
+    translatedParagraph = paragraph;
+  }
+
+  function revertParagraph(paragraph) {
+    if (!paragraph) return;
+    const original = paragraph.dataset.mirloOriginal;
+    if (!original) return;
+    paragraph.innerText = original;
+    paragraph.dataset.mirloState = "original";
+    paragraph.classList.add("mirlo-reverted");
+    paragraph.classList.remove("mirlo-translated");
+    if (translatedParagraph === paragraph) {
+      translatedParagraph = null;
+    }
+  }
+
   async function translateParagraph(paragraph) {
-    if (!paragraph || translationAttempted) return;
-    translationAttempted = true;
+    if (!paragraph) return;
+
+    const cachedTranslation = paragraph.dataset.mirloTranslated;
+    const cachedSource = paragraph.dataset.mirloSource;
+    const cachedTarget = paragraph.dataset.mirloTarget;
+    if (cachedTranslation && cachedSource && cachedTarget) {
+      applyTranslatedText(paragraph, cachedTranslation, cachedSource, cachedTarget);
+      setStatus("Translated (cached)");
+      return;
+    }
+
+    const requestId = (translationRequestId += 1);
+    translatingParagraph = paragraph;
 
     if (!("Translator" in self)) {
       setStatus("Translator unsupported");
@@ -194,6 +238,7 @@
         sourceLanguage,
         targetLanguage
       });
+      if (requestId !== translationRequestId) return;
       if (availability === "downloadable") {
         setStatus("Downloading model…");
       }
@@ -223,18 +268,13 @@
           });
         }
       });
+      if (requestId !== translationRequestId) return;
       translationStart = performance.now();
       setStatus("Translating…");
       const translated = await translator.translate(originalText);
+      if (requestId !== translationRequestId) return;
       paragraph.dataset.mirloOriginal = originalText;
-      paragraph.dataset.mirloTranslated = translated;
-      paragraph.dataset.mirloSource = sourceLanguage;
-      paragraph.dataset.mirloTarget = targetLanguage;
-      paragraph.classList.add("mirlo-translated");
-      paragraph.classList.remove("mirlo-reverted");
-      paragraph.dataset.mirloState = "translated";
-      paragraph.innerText = translated;
-      attachTooltipHandlers(paragraph);
+      applyTranslatedText(paragraph, translated, sourceLanguage, targetLanguage);
       const elapsedMs = performance.now() - (translationStart || performance.now());
       setStatus(`Translated (${(elapsedMs / 1000).toFixed(2)}s)`);
     } catch (error) {
@@ -293,6 +333,15 @@
       event.stopPropagation();
       event.preventDefault();
       if (activeParagraph) {
+        if (translatedParagraph === activeParagraph) {
+          cancelInFlightTranslation();
+          revertParagraph(activeParagraph);
+          setStatus("Reverted to English");
+          return;
+        }
+        if (translatedParagraph && translatedParagraph !== activeParagraph) {
+          revertParagraph(translatedParagraph);
+        }
         translateParagraph(activeParagraph);
       }
     });
@@ -384,10 +433,19 @@
       paragraph.innerText = paragraph.dataset.mirloOriginal || "";
       paragraph.dataset.mirloState = "original";
       paragraph.classList.add("mirlo-reverted");
+      paragraph.classList.remove("mirlo-translated");
+      if (translatedParagraph === paragraph) {
+        translatedParagraph = null;
+      }
     } else {
+      if (translatedParagraph && translatedParagraph !== paragraph) {
+        revertParagraph(translatedParagraph);
+      }
       paragraph.innerText = paragraph.dataset.mirloTranslated || "";
       paragraph.dataset.mirloState = "translated";
       paragraph.classList.remove("mirlo-reverted");
+      paragraph.classList.add("mirlo-translated");
+      translatedParagraph = paragraph;
     }
     showTooltip(paragraph);
   }
