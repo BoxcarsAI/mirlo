@@ -38,7 +38,7 @@ Remove the always-visible status indicator in the top-right corner of the page. 
 
 ---
 
-## MIRLO-002: Per-Site Activation with Article Detection
+## MIRLO-002: Per-Site Activation with Article Detection - COMPLETED
 
 **Priority:** P0 (Critical)
 **Estimated Complexity:** Medium-High

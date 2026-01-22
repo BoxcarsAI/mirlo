@@ -2,6 +2,11 @@
   const SKIP_SELECTORS =
     "script,style,textarea,code,pre,svg,math,head,title,input,option,select,button";
   const TRANSLATE_TARGET_LANGUAGE = "es";
+  const STORAGE_KEYS = {
+    enabledDomains: "mirlo:enabled_domains",
+    dismissedDomains: "mirlo:dismissed_domains"
+  };
+  const TOAST_AUTO_DISMISS_MS = 8000;
 
   let tooltipEl = null;
   let tooltipPinned = false;
@@ -12,6 +17,9 @@
   let translatedParagraph = null;
   let translatingParagraph = null;
   let translationRequestId = 0;
+  let mirloActive = false;
+  let activationToastEl = null;
+  let activationDismissTimer = null;
 
   function getHtmlLanguage() {
     const docLang = document.documentElement?.lang?.trim();
@@ -111,6 +119,135 @@
   function getWordCount(text) {
     if (!text) return 0;
     return text.trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  function normalizeDomain(hostname) {
+    if (!hostname) return "";
+    return hostname.replace(/^www\./i, "").toLowerCase();
+  }
+
+  function normalizeDomainList(list) {
+    if (!Array.isArray(list)) return [];
+    return list
+      .map((domain) => (typeof domain === "string" ? normalizeDomain(domain) : ""))
+      .filter(Boolean);
+  }
+
+  function getStoredDomains() {
+    return new Promise((resolve) => {
+      if (!chrome?.storage?.sync) {
+        resolve({
+          enabled: [],
+          dismissed: []
+        });
+        return;
+      }
+      chrome.storage.sync.get(
+        [STORAGE_KEYS.enabledDomains, STORAGE_KEYS.dismissedDomains],
+        (result) => {
+          if (chrome.runtime?.lastError) {
+            resolve({
+              enabled: [],
+              dismissed: []
+            });
+            return;
+          }
+          resolve({
+            enabled: normalizeDomainList(result?.[STORAGE_KEYS.enabledDomains]),
+            dismissed: normalizeDomainList(result?.[STORAGE_KEYS.dismissedDomains])
+          });
+        }
+      );
+    });
+  }
+
+  function setStoredDomains(key, domains) {
+    return new Promise((resolve) => {
+      if (!chrome?.storage?.sync) {
+        resolve();
+        return;
+      }
+      chrome.storage.sync.set({ [key]: domains }, () => resolve());
+    });
+  }
+
+  async function addDomainToList(key, domain) {
+    const stored = await getStoredDomains();
+    const list = key === STORAGE_KEYS.enabledDomains ? stored.enabled : stored.dismissed;
+    if (!list.includes(domain)) {
+      list.push(domain);
+      await setStoredDomains(key, list);
+    }
+    return list;
+  }
+
+  async function removeDomainFromList(key, domain) {
+    const stored = await getStoredDomains();
+    const list = key === STORAGE_KEYS.enabledDomains ? stored.enabled : stored.dismissed;
+    const next = list.filter((item) => item !== domain);
+    if (next.length !== list.length) {
+      await setStoredDomains(key, next);
+    }
+    return next;
+  }
+
+  function hasOgArticleMeta() {
+    const meta = document.querySelector('meta[property="og:type"]');
+    if (!meta) return false;
+    const content = meta.getAttribute("content") || "";
+    return content.trim().toLowerCase() === "article";
+  }
+
+  function hasArticleSchema() {
+    const scripts = Array.from(
+      document.querySelectorAll('script[type="application/ld+json"]')
+    );
+    for (const script of scripts) {
+      const jsonText = script.textContent?.trim();
+      if (!jsonText) continue;
+      try {
+        const parsed = JSON.parse(jsonText);
+        const nodes = Array.isArray(parsed) ? parsed : [parsed];
+        for (const node of nodes) {
+          const typeValue = node?.["@type"];
+          const types = Array.isArray(typeValue) ? typeValue : [typeValue];
+          if (types.some((type) => ["Article", "NewsArticle", "BlogPosting"].includes(type))) {
+            return true;
+          }
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    return false;
+  }
+
+  function urlLooksLikeArticle() {
+    const path = `${location.pathname || ""}`.toLowerCase();
+    return ["/article/", "/post/", "/blog/", "/news/", "/story/"].some((segment) =>
+      path.includes(segment)
+    );
+  }
+
+  function hasParagraphHeuristic() {
+    const paragraphs = Array.from(document.querySelectorAll("p"));
+    let qualifying = 0;
+    for (const paragraph of paragraphs) {
+      if (!isVisibleElement(paragraph)) continue;
+      const text = paragraph.innerText?.trim();
+      if (!text) continue;
+      if (getWordCount(text) < 15) continue;
+      qualifying += 1;
+      if (qualifying >= 3) return true;
+    }
+    return false;
+  }
+
+  function isArticleLike() {
+    if (hasOgArticleMeta()) return true;
+    if (hasArticleSchema()) return true;
+    if (urlLooksLikeArticle()) return true;
+    return hasParagraphHeuristic();
   }
 
   function getParagraphText(paragraph) {
@@ -430,7 +567,9 @@
     return false;
   }
 
-  function init() {
+  function activateMirlo() {
+    if (mirloActive) return;
+    mirloActive = true;
     logAiStatus();
     document.addEventListener("mouseover", (event) => {
       handleParagraphHover(event.target);
@@ -442,13 +581,88 @@
         hideBadge();
       }
     });
+  }
 
+  function removeActivationToast() {
+    if (!activationToastEl) return;
+    activationToastEl.classList.remove("is-visible");
+    activationToastEl.classList.add("is-hiding");
+    window.setTimeout(() => {
+      activationToastEl?.remove();
+      activationToastEl = null;
+    }, 200);
+  }
+
+  function showActivationToast(domain) {
+    if (activationToastEl || mirloActive) return;
+    activationToastEl = document.createElement("div");
+    activationToastEl.className = "mirlo-toast";
+    activationToastEl.innerHTML = `
+      <div class="mirlo-toast-icon">🌐</div>
+      <div class="mirlo-toast-content">
+        <div class="mirlo-toast-title">Enable Mirlo on ${domain}?</div>
+        <div class="mirlo-toast-actions">
+          <button class="mirlo-toast-button is-primary" type="button">Enable</button>
+          <button class="mirlo-toast-button" type="button">Not now</button>
+        </div>
+      </div>
+    `;
+
+    const [enableButton, dismissButton] =
+      activationToastEl.querySelectorAll(".mirlo-toast-button");
+
+    const cleanupTimers = () => {
+      if (activationDismissTimer) {
+        window.clearTimeout(activationDismissTimer);
+        activationDismissTimer = null;
+      }
+    };
+
+    const dismissToast = async () => {
+      cleanupTimers();
+      await addDomainToList(STORAGE_KEYS.dismissedDomains, domain);
+      removeActivationToast();
+    };
+
+    enableButton?.addEventListener("click", async () => {
+      cleanupTimers();
+      await addDomainToList(STORAGE_KEYS.enabledDomains, domain);
+      await removeDomainFromList(STORAGE_KEYS.dismissedDomains, domain);
+      removeActivationToast();
+      activateMirlo();
+    });
+
+    dismissButton?.addEventListener("click", () => {
+      dismissToast();
+    });
+
+    document.body.appendChild(activationToastEl);
+    requestAnimationFrame(() => {
+      activationToastEl?.classList.add("is-visible");
+    });
+
+    activationDismissTimer = window.setTimeout(() => {
+      dismissToast();
+    }, TOAST_AUTO_DISMISS_MS);
+  }
+
+  async function handleActivationFlow() {
+    const domain = normalizeDomain(location.hostname);
+    if (!domain) return;
+    const stored = await getStoredDomains();
+    if (stored.enabled.includes(domain)) {
+      activateMirlo();
+      return;
+    }
+    if (stored.dismissed.includes(domain)) return;
+    if (!isArticleLike()) return;
+    showActivationToast(domain);
   }
 
   if (document.readyState === "loading") {
-    window.addEventListener("DOMContentLoaded", init, { once: true });
+    window.addEventListener("DOMContentLoaded", handleActivationFlow, { once: true });
   } else {
-    init();
+    handleActivationFlow();
   }
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
