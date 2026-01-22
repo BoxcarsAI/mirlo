@@ -1,6 +1,37 @@
 (() => {
   const SKIP_SELECTORS =
     "script,style,textarea,code,pre,svg,math,head,title,input,option,select,button";
+  const SKIP_CONTAINERS = [
+    "nav",
+    "header",
+    "footer",
+    "aside",
+    "form",
+    '[role="navigation"]',
+    '[role="banner"]',
+    '[role="contentinfo"]',
+    '[role="complementary"]',
+    '[role="search"]',
+    '[role="form"]',
+    ".sidebar",
+    ".menu",
+    ".nav",
+    ".footer",
+    ".header",
+    ".comment",
+    ".comments",
+    ".ad",
+    ".advertisement",
+    ".promo",
+    ".related",
+    ".recommended",
+    "#sidebar",
+    "#menu",
+    "#nav",
+    "#footer",
+    "#header",
+    "#comments"
+  ].join(",");
   const TRANSLATE_TARGET_LANGUAGE = "es";
   const STORAGE_KEYS = {
     enabledDomains: "mirlo:enabled_domains",
@@ -281,7 +312,7 @@
 
   function isVisibleElement(element) {
     if (!element) return false;
-    if (element.closest("nav,header,footer,aside")) return false;
+    if (element.closest(SKIP_CONTAINERS)) return false;
     const rect = element.getBoundingClientRect();
     if (!rect || rect.width < 20 || rect.height < 16) return false;
     return true;
