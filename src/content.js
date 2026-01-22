@@ -12,6 +12,10 @@
   let tooltipEl = null;
   let tooltipPinned = false;
   let tooltipHideTimer = null;
+  let statusEl = null;
+  let translationStart = null;
+  let badgeEl = null;
+  let activeParagraph = null;
 
   function getHtmlLanguage() {
     const docLang = document.documentElement?.lang?.trim();
@@ -134,11 +138,22 @@
     return null;
   }
 
+  function isEligibleParagraph(paragraph) {
+    if (!paragraph) return false;
+    if (!isVisibleElement(paragraph)) return false;
+    const text = paragraph.innerText?.trim();
+    if (!text) return false;
+    if (getWordCount(text) <= 15) return false;
+    if (paragraph.classList.contains("mirlo-translated")) return false;
+    return true;
+  }
+
   async function translateParagraph(paragraph) {
     if (!paragraph || translationAttempted) return;
     translationAttempted = true;
 
     if (!("Translator" in self)) {
+      setStatus("Translator unsupported");
       console.log("Translator API missing");
       return;
     }
@@ -151,12 +166,17 @@
         sourceLanguage,
         targetLanguage
       });
+      if (availability === "downloadable") {
+        setStatus("Downloading model…");
+      }
       if (availability !== "available" && availability !== "downloadable") {
         console.log("Translator unavailable:", availability);
+        setStatus(`Translator ${availability}`);
         return;
       }
     } catch (error) {
       console.log("Translator availability error", error);
+      setStatus("Translator unavailable");
       return;
     }
 
@@ -164,10 +184,19 @@
     if (!originalText) return;
 
     try {
+      setStatus("Preparing translator…");
       const translator = await self.Translator.create({
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
+        monitor(m) {
+          m.addEventListener("downloadprogress", (event) => {
+            const percent = Math.round(event.loaded * 100);
+            setStatus(`Downloading model… ${percent}%`);
+          });
+        }
       });
+      translationStart = performance.now();
+      setStatus("Translating…");
       const translated = await translator.translate(originalText);
       paragraph.dataset.mirloOriginal = originalText;
       paragraph.dataset.mirloTranslated = translated;
@@ -178,25 +207,30 @@
       paragraph.dataset.mirloState = "translated";
       paragraph.innerText = translated;
       attachTooltipHandlers(paragraph);
+      const elapsedMs = performance.now() - (translationStart || performance.now());
+      setStatus(`Translated (${(elapsedMs / 1000).toFixed(2)}s)`);
     } catch (error) {
       console.log("Translation failed", error);
+      setStatus("Translation failed");
     }
   }
 
   function maybeTranslateParagraph() {
-    const paragraph = findParagraphToTranslate();
-    if (!paragraph) return;
+    setStatus("Hover a paragraph to translate");
+  }
 
-    if (document.userActivation?.isActive || document.userActivation?.hasBeenActive) {
-      translateParagraph(paragraph);
-      return;
-    }
+  function ensureStatus() {
+    if (statusEl) return statusEl;
+    statusEl = document.createElement("div");
+    statusEl.className = "mirlo-status";
+    statusEl.textContent = "Mirlo: Checking…";
+    document.body.appendChild(statusEl);
+    return statusEl;
+  }
 
-    const onFirstClick = () => {
-      document.removeEventListener("click", onFirstClick, true);
-      translateParagraph(paragraph);
-    };
-    document.addEventListener("click", onFirstClick, true);
+  function setStatus(message) {
+    const status = ensureStatus();
+    status.textContent = `Mirlo: ${message}`;
   }
 
   function ensureTooltip() {
@@ -219,6 +253,52 @@
     });
     document.body.appendChild(tooltipEl);
     return tooltipEl;
+  }
+
+  function ensureBadge() {
+    if (badgeEl) return badgeEl;
+    badgeEl = document.createElement("button");
+    badgeEl.type = "button";
+    badgeEl.className = "mirlo-badge";
+    badgeEl.innerHTML = `<span class="mirlo-badge-icon">🌐</span><span class="mirlo-badge-text">MIRLO</span>`;
+    badgeEl.addEventListener("click", (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      if (activeParagraph) {
+        translateParagraph(activeParagraph);
+      }
+    });
+    return badgeEl;
+  }
+
+  function showBadge(paragraph) {
+    if (!paragraph) return;
+    const badge = ensureBadge();
+    if (badge.parentElement !== paragraph) {
+      paragraph.appendChild(badge);
+    }
+    paragraph.classList.add("mirlo-hoverable");
+    badge.classList.add("is-visible");
+  }
+
+  function hideBadge() {
+    if (!badgeEl) return;
+    badgeEl.classList.remove("is-visible");
+  }
+
+  function handleParagraphHover(target) {
+    const paragraph = target?.closest?.("p");
+    if (!paragraph || !isEligibleParagraph(paragraph)) {
+      activeParagraph = null;
+      hideBadge();
+      return;
+    }
+
+    if (activeParagraph !== paragraph) {
+      activeParagraph = paragraph;
+      showBadge(paragraph);
+      setStatus("Ready to translate");
+    }
   }
 
   function positionTooltip(target, tooltip) {
@@ -370,7 +450,19 @@
   function init() {
     logAiStatus();
     scheduleScan();
+    ensureStatus();
+    setStatus("Checking…");
     maybeTranslateParagraph();
+    document.addEventListener("mouseover", (event) => {
+      handleParagraphHover(event.target);
+    });
+    document.addEventListener("mouseout", (event) => {
+      const related = event.relatedTarget;
+      if (related && badgeEl && badgeEl.contains(related)) return;
+      if (!activeParagraph || !activeParagraph.contains(related)) {
+        hideBadge();
+      }
+    });
 
     const observer = new MutationObserver(() => {
       if (highlights >= MAX_HIGHLIGHTS) return;
