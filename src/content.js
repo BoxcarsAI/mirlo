@@ -117,6 +117,34 @@
     return text.trim().split(/\s+/).filter(Boolean).length;
   }
 
+  function getParagraphText(paragraph) {
+    if (!paragraph) return "";
+    const walker = document.createTreeWalker(
+      paragraph,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          if (parent.closest(".mirlo-badge")) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    let text = "";
+    let current = walker.nextNode();
+    while (current) {
+      const value = current.nodeValue?.trim();
+      if (value) {
+        text = `${text} ${value}`.trim();
+      }
+      current = walker.nextNode();
+    }
+
+    return text;
+  }
+
   function isVisibleElement(element) {
     if (!element) return false;
     if (element.closest("nav,header,footer,aside")) return false;
@@ -180,7 +208,7 @@
       return;
     }
 
-    const originalText = paragraph.innerText?.trim();
+    const originalText = getParagraphText(paragraph);
     if (!originalText) return;
 
     try {
