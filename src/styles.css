@@ -87,16 +87,13 @@
   bottom: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
+  padding: 3px 6px;
   border-radius: 999px;
   border: 1px solid #e2e8f0;
   background: rgba(255, 255, 255, 0.92);
   color: #0f172a;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
@@ -108,14 +105,6 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-}
-
-.mirlo-badge-icon {
-  font-size: 12px;
-}
-
-.mirlo-badge-text {
-  font-style: italic;
 }
 
 .mirlo-toast {

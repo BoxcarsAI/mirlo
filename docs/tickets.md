@@ -125,7 +125,7 @@ Show toast prompt (bottom-right)
 
 ---
 
-## MIRLO-003: Replace Background Styling with End Marker
+## MIRLO-003: Replace Background Styling with End Marker COMPLETED
 
 **Priority:** P0 (Critical)
 **Estimated Complexity:** Simple
@@ -181,7 +181,7 @@ paragraph.innerText = translated + " ·";
 
 ---
 
-## MIRLO-004: Simplify Badge to Globe Icon Only
+## MIRLO-004: Simplify Badge to Globe Icon Only - COMPLETED
 
 **Priority:** P1 (Important)
 **Estimated Complexity:** Simple

@@ -443,7 +443,8 @@
     badgeEl = document.createElement("button");
     badgeEl.type = "button";
     badgeEl.className = "mirlo-badge";
-    badgeEl.innerHTML = `<span class="mirlo-badge-icon">🌐</span><span class="mirlo-badge-text">MIRLO</span>`;
+    badgeEl.title = "Translate with Mirlo";
+    badgeEl.textContent = "🌐";
     badgeEl.addEventListener("click", (event) => {
       event.stopPropagation();
       event.preventDefault();
