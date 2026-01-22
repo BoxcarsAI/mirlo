@@ -6,7 +6,6 @@
   let tooltipEl = null;
   let tooltipPinned = false;
   let tooltipHideTimer = null;
-  let statusEl = null;
   let translationStart = null;
   let badgeEl = null;
   let activeParagraph = null;
@@ -212,7 +211,6 @@
     const cachedTarget = paragraph.dataset.mirloTarget;
     if (cachedTranslation && cachedSource && cachedTarget) {
       applyTranslatedText(paragraph, cachedTranslation, cachedSource, cachedTarget);
-      setStatus("Translated (cached)");
       return;
     }
 
@@ -220,7 +218,6 @@
     translatingParagraph = paragraph;
 
     if (!("Translator" in self)) {
-      setStatus("Translator unsupported");
       console.log("Translator API missing");
       return;
     }
@@ -235,16 +232,13 @@
       });
       if (requestId !== translationRequestId) return;
       if (availability === "downloadable") {
-        setStatus("Downloading model…");
       }
       if (availability !== "available" && availability !== "downloadable") {
         console.log("Translator unavailable:", availability);
-        setStatus(`Translator ${availability}`);
         return;
       }
     } catch (error) {
       console.log("Translator availability error", error);
-      setStatus("Translator unavailable");
       return;
     }
 
@@ -252,48 +246,25 @@
     if (!originalText) return;
 
     try {
-      setStatus("Preparing translator…");
       const translator = await self.Translator.create({
         sourceLanguage,
         targetLanguage,
         monitor(m) {
           m.addEventListener("downloadprogress", (event) => {
             const percent = Math.round(event.loaded * 100);
-            setStatus(`Downloading model… ${percent}%`);
           });
         }
       });
       if (requestId !== translationRequestId) return;
       translationStart = performance.now();
-      setStatus("Translating…");
       const translated = await translator.translate(originalText);
       if (requestId !== translationRequestId) return;
       paragraph.dataset.mirloOriginal = originalText;
       applyTranslatedText(paragraph, translated, sourceLanguage, targetLanguage);
       const elapsedMs = performance.now() - (translationStart || performance.now());
-      setStatus(`Translated (${(elapsedMs / 1000).toFixed(2)}s)`);
     } catch (error) {
       console.log("Translation failed", error);
-      setStatus("Translation failed");
     }
-  }
-
-  function maybeTranslateParagraph() {
-    setStatus("Hover a paragraph to translate");
-  }
-
-  function ensureStatus() {
-    if (statusEl) return statusEl;
-    statusEl = document.createElement("div");
-    statusEl.className = "mirlo-status";
-    statusEl.textContent = "Mirlo: Checking…";
-    document.body.appendChild(statusEl);
-    return statusEl;
-  }
-
-  function setStatus(message) {
-    const status = ensureStatus();
-    status.textContent = `Mirlo: ${message}`;
   }
 
   function ensureTooltip() {
@@ -331,7 +302,6 @@
         if (translatedParagraph === activeParagraph) {
           cancelInFlightTranslation();
           revertParagraph(activeParagraph);
-          setStatus("Reverted to English");
           return;
         }
         if (translatedParagraph && translatedParagraph !== activeParagraph) {
@@ -369,7 +339,6 @@
     if (activeParagraph !== paragraph) {
       activeParagraph = paragraph;
       showBadge(paragraph);
-      setStatus("Ready to translate");
     }
   }
 
@@ -463,9 +432,6 @@
 
   function init() {
     logAiStatus();
-    ensureStatus();
-    setStatus("Checking…");
-    maybeTranslateParagraph();
     document.addEventListener("mouseover", (event) => {
       handleParagraphHover(event.target);
     });
