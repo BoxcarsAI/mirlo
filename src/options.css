@@ -25,12 +25,12 @@ body {
   margin: 0;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   color: var(--mirlo-slate-700);
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 60%, #eef2f7 100%);
+  background: var(--mirlo-white);
 }
 
 .options-header {
-  background: linear-gradient(135deg, #f0fdfa 0%, #fff7ed 100%);
-  border-bottom: 1px solid var(--mirlo-slate-200);
+  background: var(--mirlo-white);
+  border-bottom: none;
   padding: 24px 24px 28px;
 }
 
@@ -46,7 +46,6 @@ body {
   object-fit: contain;
   border-radius: 18px;
   background: var(--mirlo-white);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
 .options-header-text {
@@ -78,7 +77,8 @@ body {
   background: var(--mirlo-white);
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--mirlo-slate-200);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
