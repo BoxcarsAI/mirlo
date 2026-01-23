@@ -60,6 +60,16 @@ function showStatus(message, type) {
   }, 2500);
 }
 
+function validateLanguages(source, target) {
+  if (source === target) {
+    return {
+      valid: false,
+      message: "Source and target languages must be different."
+    };
+  }
+  return { valid: true };
+}
+
 async function init() {
   const settings = await getSettings();
   sourceSelect.value = settings.source;
@@ -70,13 +80,19 @@ saveButton.addEventListener("click", async () => {
   const source = sourceSelect.value;
   const target = targetSelect.value;
 
+  const validation = validateLanguages(source, target);
+  if (!validation.valid) {
+    showStatus(validation.message, "error");
+    return;
+  }
+
   saveButton.disabled = true;
   saveButton.textContent = "Saving...";
 
   const saved = await saveSettings(source, target);
 
   if (saved) {
-    showStatus("Settings saved.", "success");
+    showStatus("✓ Settings saved successfully!", "success");
     saveButton.textContent = "Saved!";
   } else {
     showStatus("Unable to save settings.", "error");

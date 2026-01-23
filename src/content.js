@@ -32,10 +32,11 @@
     "#header",
     "#comments"
   ].join(",");
-  const TRANSLATE_TARGET_LANGUAGE = "es";
   const STORAGE_KEYS = {
     enabledDomains: "mirlo:enabled_domains",
-    dismissedDomains: "mirlo:dismissed_domains"
+    dismissedDomains: "mirlo:dismissed_domains",
+    sourceLanguage: "mirlo:source_language",
+    targetLanguage: "mirlo:target_language"
   };
   const TOAST_AUTO_DISMISS_MS = 8000;
 
@@ -52,6 +53,8 @@
   let listenersBound = false;
   let activationToastEl = null;
   let activationDismissTimer = null;
+  let userSourceLanguage = "en";
+  let userTargetLanguage = "es";
   const MARKER_TEXT = "·";
 
   function getHtmlLanguage() {
@@ -144,9 +147,47 @@
   }
 
   function getSourceLanguage() {
+    return userSourceLanguage || "en";
+  }
+
+  function getNormalizedPageLanguage() {
     const htmlLang = getHtmlLanguage();
-    if (!htmlLang) return "en";
+    if (!htmlLang) return "";
     return htmlLang.split("-")[0].toLowerCase();
+  }
+
+  function getLanguageName(code) {
+    const names = {
+      en: "English",
+      es: "Spanish",
+      fr: "French",
+      de: "German"
+    };
+    return names[code] || (code ? code.toUpperCase() : "");
+  }
+
+  async function getLanguagePreferences() {
+    return new Promise((resolve) => {
+      if (!chrome?.storage?.sync) {
+        resolve({ source: "en", target: "es" });
+        return;
+      }
+      chrome.storage.sync.get(
+        [STORAGE_KEYS.sourceLanguage, STORAGE_KEYS.targetLanguage],
+        (result) => {
+          resolve({
+            source: result?.[STORAGE_KEYS.sourceLanguage] || "en",
+            target: result?.[STORAGE_KEYS.targetLanguage] || "es"
+          });
+        }
+      );
+    });
+  }
+
+  async function initializeLanguageSettings() {
+    const prefs = await getLanguagePreferences();
+    userSourceLanguage = prefs.source;
+    userTargetLanguage = prefs.target;
   }
 
   function getWordCount(text) {
@@ -404,7 +445,7 @@
     }
 
     const sourceLanguage = getSourceLanguage();
-    const targetLanguage = TRANSLATE_TARGET_LANGUAGE;
+    const targetLanguage = userTargetLanguage;
 
     try {
       const availability = await self.Translator.availability({
@@ -543,13 +584,21 @@
   function showTooltip(paragraph) {
     const tooltip = ensureTooltip();
     const bodyEl = tooltip.querySelector(".mirlo-tooltip-body");
+    const titleEl = tooltip.querySelector(".mirlo-tooltip-title");
     const button = tooltip.querySelector(".mirlo-tooltip-button");
     const state = paragraph.dataset.mirloState || "translated";
     const original = paragraph.dataset.mirloOriginal || "";
     const translated = paragraph.dataset.mirloTranslated || "";
+    const sourceLang = paragraph.dataset.mirloSource || userSourceLanguage;
+    const targetLang = paragraph.dataset.mirloTarget || userTargetLanguage;
+
+    titleEl.textContent =
+      state === "translated" ? getLanguageName(targetLang) : getLanguageName(sourceLang);
     bodyEl.textContent = state === "translated" ? original : translated;
     button.textContent =
-      state === "translated" ? "Switch to English" : "Switch to Spanish";
+      state === "translated"
+        ? `Switch to ${getLanguageName(sourceLang)}`
+        : `Switch to ${getLanguageName(targetLang)}`;
     button.onclick = () => toggleParagraphState(paragraph);
 
     positionTooltip(paragraph, tooltip);
@@ -714,15 +763,27 @@
   }
 
   async function handleActivationFlow() {
+    await initializeLanguageSettings();
     const domain = normalizeDomain(location.hostname);
     if (!domain) return;
     const stored = await getStoredDomains();
     if (stored.enabled.includes(domain)) {
+      const pageLanguage = getNormalizedPageLanguage();
+      if (pageLanguage !== userSourceLanguage) {
+        console.log(
+          `Page language (${pageLanguage}) doesn't match source (${userSourceLanguage})`
+        );
+        return;
+      }
       activateMirlo();
       return;
     }
     if (stored.dismissed.includes(domain)) return;
     if (!isArticleLike()) return;
+    const pageLanguage = getNormalizedPageLanguage();
+    if (pageLanguage !== userSourceLanguage) {
+      return;
+    }
     showActivationToast(domain);
   }
 
@@ -746,10 +807,13 @@
     if (message?.type === "mirlo:setActive") {
       if (message?.enabled) {
         removeActivationToast();
-        activateMirlo();
-      } else {
-        deactivateMirlo();
+        initializeLanguageSettings().then(() => {
+          activateMirlo();
+          sendResponse({ active: mirloActive });
+        });
+        return true;
       }
+      deactivateMirlo();
       sendResponse({ active: mirloActive });
       return;
     }

@@ -252,7 +252,7 @@ Build the beautiful, modern UI for the options page following brand guidelines i
 
 ---
 
-## MIRLO-OPT-003: Implement Options Page JavaScript Logic
+## MIRLO-OPT-003: Implement Options Page JavaScript Logic - COMPLETED
 
 **Priority:** P0 (Critical)
 **Estimated Complexity:** Medium
@@ -391,13 +391,13 @@ if (document.readyState === "loading") {
 - Disable save button during save operation
 
 ### Acceptance Criteria
-- [ ] Options page loads with saved settings
-- [ ] Changing dropdowns updates internal state
-- [ ] Save button saves to chrome.storage.sync
-- [ ] Success message shows after save
-- [ ] Validation prevents same source/target
-- [ ] Error messages are user-friendly
-- [ ] Settings persist across browser restarts
+- [x] Options page loads with saved settings
+- [x] Changing dropdowns updates internal state
+- [x] Save button saves to chrome.storage.sync
+- [x] Success message shows after save
+- [x] Validation prevents same source/target
+- [x] Error messages are user-friendly
+- [x] Settings persist across browser restarts
 
 ### Testing
 1. Open options page - verify defaults load (English → Spanish)
@@ -408,7 +408,7 @@ if (document.readyState === "loading") {
 
 ---
 
-## MIRLO-OPT-004: Update Content Script to Use Saved Languages
+## MIRLO-OPT-004: Update Content Script to Use Saved Languages - COMPLETED
 
 **Priority:** P0 (Critical)
 **Estimated Complexity:** Medium
@@ -561,12 +561,12 @@ function showTooltip(paragraph) {
 ```
 
 ### Acceptance Criteria
-- [ ] Content script loads language preferences on page load
-- [ ] Translation uses user-selected target language
-- [ ] Source language detection respects user preference
-- [ ] Mirlo only activates on pages matching source language
-- [ ] Toast only appears on pages matching source language
-- [ ] Tooltip shows correct language names
+- [x] Content script loads language preferences on page load
+- [x] Translation uses user-selected target language
+- [x] Source language detection respects user preference
+- [x] Mirlo only activates on pages matching source language
+- [x] Toast only appears on pages matching source language
+- [x] Tooltip shows correct language names
 - [ ] Settings changes apply on next page load
 
 ### Testing
