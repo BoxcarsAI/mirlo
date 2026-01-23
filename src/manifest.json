@@ -5,7 +5,19 @@
   "description": "Privacy-first language learning highlights.",
   "action": {
     "default_title": "Mirlo",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/mirlo-16.png",
+      "32": "assets/mirlo-32.png",
+      "48": "assets/mirlo-48.png",
+      "128": "assets/mirlo-128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/mirlo-16.png",
+    "32": "assets/mirlo-32.png",
+    "48": "assets/mirlo-48.png",
+    "128": "assets/mirlo-128.png"
   },
   "permissions": ["activeTab", "scripting", "storage"],
   "content_scripts": [
