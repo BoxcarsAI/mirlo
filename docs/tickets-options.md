@@ -584,7 +584,7 @@ function showTooltip(paragraph) {
 
 ---
 
-## MIRLO-OPT-005: Update Popup to Show Language Pair
+## MIRLO-OPT-005: Update Popup to Show Language Pair - COMPLETED
 
 **Priority:** P1 (Important)
 **Estimated Complexity:** Simple
@@ -715,11 +715,11 @@ optionsLink.addEventListener("click", (event) => {
 ```
 
 ### Acceptance Criteria
-- [ ] Popup displays current language pair
-- [ ] Language badges use brand colors
-- [ ] "Change languages →" link opens options page
-- [ ] Languages update when options are changed
-- [ ] Layout still looks good on the small popup
+- [x] Popup displays current language pair
+- [x] Language badges use brand colors
+- [x] "Change languages →" link opens options page
+- [x] Languages update when options are changed
+- [x] Layout still looks good on the small popup
 
 ### Testing
 1. Open popup - verify shows default "English → Spanish"

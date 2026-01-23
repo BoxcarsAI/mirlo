@@ -62,6 +62,36 @@
         background: #e5e7eb;
         margin: 10px 0;
       }
+      .language-info {
+        margin-bottom: 10px;
+      }
+      .language-pair {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+      }
+      .language-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #f0fdfa;
+        color: #0f766e;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .language-arrow {
+        font-size: 14px;
+        color: #9ca3af;
+      }
+      .options-link {
+        color: #0f766e;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .options-link:hover {
+        text-decoration: underline;
+      }
       .meta-line {
         font-size: 11px;
         color: #374151;
@@ -79,8 +109,17 @@
       <div class="status-pill" id="site-status">✓ Enabled</div>
       <button class="toggle-button" id="toggle-site" type="button">Disable</button>
     </div>
+    <div class="language-info">
+      <div class="language-pair">
+        <span class="language-badge" id="source-lang">English</span>
+        <span class="language-arrow">→</span>
+        <span class="language-badge" id="target-lang">Spanish</span>
+      </div>
+    </div>
     <div class="divider"></div>
-    <p class="meta-line">Target: Spanish</p>
+    <p class="meta-line">
+      <a href="#" id="open-options" class="options-link">Change languages →</a>
+    </p>
     <p class="meta-line" id="ai-status">AI Status: Checking…</p>
     <p class="meta-line" id="page-language">Page Language: Checking…</p>
     <script src="popup.js"></script>

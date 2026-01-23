@@ -3,15 +3,48 @@ const languageEl = document.getElementById("page-language");
 const domainEl = document.getElementById("site-domain");
 const siteStatusEl = document.getElementById("site-status");
 const toggleButton = document.getElementById("toggle-site");
+const sourceLangEl = document.getElementById("source-lang");
+const targetLangEl = document.getElementById("target-lang");
+const optionsLink = document.getElementById("open-options");
 
 const STORAGE_KEYS = {
   enabledDomains: "mirlo:enabled_domains",
-  dismissedDomains: "mirlo:dismissed_domains"
+  dismissedDomains: "mirlo:dismissed_domains",
+  sourceLanguage: "mirlo:source_language",
+  targetLanguage: "mirlo:target_language"
 };
 
 let currentDomain = "";
 let currentEnabled = false;
 let currentTabId = null;
+
+function getLanguageName(code) {
+  const names = {
+    en: "English",
+    es: "Spanish",
+    fr: "French",
+    de: "German"
+  };
+  return names[code] || (code ? code.toUpperCase() : "");
+}
+
+function loadLanguagePreferences() {
+  return new Promise((resolve) => {
+    if (!chrome?.storage?.sync) {
+      resolve({ source: "en", target: "es" });
+      return;
+    }
+    chrome.storage.sync.get(
+      [STORAGE_KEYS.sourceLanguage, STORAGE_KEYS.targetLanguage],
+      (result) => {
+        resolve({
+          source: result?.[STORAGE_KEYS.sourceLanguage] || "en",
+          target: result?.[STORAGE_KEYS.targetLanguage] || "es"
+        });
+      }
+    );
+  });
+}
 
 function formatLanguage(info) {
   if (!info) return "Unknown";
@@ -120,6 +153,11 @@ function setSiteUi({ domain, enabled, toggleDisabled }) {
 async function initializePopup(tab) {
   currentTabId = tab?.id ?? null;
   currentDomain = getDomainFromUrl(tab?.url);
+
+  const languages = await loadLanguagePreferences();
+  if (sourceLangEl) sourceLangEl.textContent = getLanguageName(languages.source);
+  if (targetLangEl) targetLangEl.textContent = getLanguageName(languages.target);
+
   if (!currentDomain) {
     setSiteUi({ domain: "Site unavailable", enabled: false, toggleDisabled: true });
     updateUi(null);
@@ -159,6 +197,11 @@ toggleButton.addEventListener("click", async () => {
       toggleButton.disabled = false;
     }
   );
+});
+
+optionsLink?.addEventListener("click", (event) => {
+  event.preventDefault();
+  chrome.runtime.openOptionsPage();
 });
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
