@@ -36,3 +36,6 @@ Goal: Probe Chrome’s built-in AI/translation APIs to confirm availability and 
 - No account sign-ups, external APIs, or data collection.
 - All processing should remain local to the browser.
 - Keep the MVP small and reversible.
+
+The mirlo bird svg is creative commons: https://creativecommons.org/publicdomain/zero/1.0/
+and downloaded from: https://svgsilh.com/tag/blackbird-1.html
