@@ -1,0 +1,215 @@
+:root {
+  --mirlo-teal-700: #0f766e;
+  --mirlo-teal-600: #0d9488;
+  --mirlo-teal-100: #ccfbf1;
+  --mirlo-orange-500: #f97316;
+  --mirlo-orange-400: #fb923c;
+  --mirlo-orange-100: #ffedd5;
+  --mirlo-slate-900: #0f172a;
+  --mirlo-slate-700: #334155;
+  --mirlo-slate-400: #94a3b8;
+  --mirlo-slate-200: #e2e8f0;
+  --mirlo-slate-100: #f1f5f9;
+  --mirlo-white: #ffffff;
+  --mirlo-green-600: #059669;
+  --mirlo-green-100: #d1fae5;
+  --mirlo-red-600: #dc2626;
+  --mirlo-red-100: #fee2e2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: var(--mirlo-slate-700);
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 60%, #eef2f7 100%);
+}
+
+.options-header {
+  background: linear-gradient(135deg, #f0fdfa 0%, #fff7ed 100%);
+  border-bottom: 1px solid var(--mirlo-slate-200);
+  padding: 24px 24px 28px;
+}
+
+.options-header-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.options-hero-banner {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 18px;
+  background: var(--mirlo-white);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.options-header-text {
+  padding-top: 20px;
+  text-align: center;
+}
+
+.options-title {
+  font-family: "Manrope", system-ui, -apple-system, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--mirlo-slate-900);
+  margin: 0 0 8px;
+}
+
+.options-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: var(--mirlo-slate-700);
+}
+
+.options-main {
+  padding: 32px 24px 64px;
+}
+
+.options-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--mirlo-white);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.options-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
+}
+
+.options-section-title {
+  font-family: "Manrope", system-ui, -apple-system, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--mirlo-slate-900);
+  margin: 0 0 24px;
+}
+
+.options-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.options-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mirlo-slate-700);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.options-label-hint {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mirlo-slate-400);
+}
+
+.options-select {
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--mirlo-slate-200);
+  padding: 0 14px;
+  font-size: 16px;
+  background: var(--mirlo-white);
+  color: var(--mirlo-slate-900);
+  transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mirlo-slate-400) 50%),
+    linear-gradient(135deg, var(--mirlo-slate-400) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.options-select:focus {
+  outline: none;
+  border-color: var(--mirlo-teal-600);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+  background: var(--mirlo-white);
+}
+
+.options-save-button {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: var(--mirlo-teal-700);
+  color: var(--mirlo-white);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 200ms ease, transform 150ms ease;
+}
+
+.options-save-button:hover {
+  background: var(--mirlo-teal-600);
+}
+
+.options-save-button:active {
+  transform: scale(0.99);
+}
+
+.options-save-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+}
+
+.options-save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.options-status {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.options-status.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.options-status.is-success {
+  color: var(--mirlo-green-600);
+  background: var(--mirlo-green-100);
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.options-status.is-error {
+  color: var(--mirlo-red-600);
+  background: var(--mirlo-red-100);
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+@media (max-width: 640px) {
+  .options-header {
+    padding: 24px 16px;
+  }
+
+  .options-main {
+    padding: 24px 16px 48px;
+  }
+
+  .options-card {
+    padding: 24px;
+  }
+}

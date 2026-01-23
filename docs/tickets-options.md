@@ -21,7 +21,7 @@ Add more languages after beta based on user requests and testing.
 
 ---
 
-## MIRLO-OPT-001: Create Options Page Foundation
+## MIRLO-OPT-001: Create Options Page Foundation - COMPLETED
 
 **Priority:** P0 (Critical)
 **Estimated Complexity:** Simple
@@ -70,10 +70,10 @@ src/
 ```
 
 ### Acceptance Criteria
-- [ ] Right-click extension icon shows "Options" menu item
-- [ ] Clicking "Options" opens the options page in a new tab
-- [ ] Page has proper HTML structure and loads without errors
-- [ ] Basic styling is applied (fonts, colors, layout)
+- [x] Right-click extension icon shows "Options" menu item
+- [x] Clicking "Options" opens the options page in a new tab
+- [x] Page has proper HTML structure and loads without errors
+- [x] Basic styling is applied (fonts, colors, layout)
 
 ### Testing
 1. Load extension in Chrome
@@ -84,7 +84,7 @@ src/
 
 ---
 
-## MIRLO-OPT-002: Design and Implement Options Page UI
+## MIRLO-OPT-002: Design and Implement Options Page UI - COMPLETED
 
 **Priority:** P0 (Critical)
 **Estimated Complexity:** Medium
@@ -233,14 +233,14 @@ Build the beautiful, modern UI for the options page following brand guidelines i
    - Hero image: subtle float animation (optional)
 
 ### Acceptance Criteria
-- [ ] Hero banner displays mirlo.png with gradient background
-- [ ] Both language dropdowns render with flag emojis
-- [ ] All fonts match brand guidelines (Inter/Manrope)
-- [ ] Colors match brand palette
-- [ ] Save button shows loading/success states
-- [ ] Page is fully responsive on mobile
-- [ ] All interactive elements have hover/focus states
-- [ ] Smooth animations on state changes
+- [x] Hero banner displays mirlo.png with gradient background
+- [x] Both language dropdowns render with flag emojis
+- [x] All fonts match brand guidelines (Inter/Manrope)
+- [x] Colors match brand palette
+- [x] Save button shows loading/success states
+- [x] Page is fully responsive on mobile
+- [x] All interactive elements have hover/focus states
+- [x] Smooth animations on state changes
 
 ### Testing
 1. Open options page - verify hero banner looks good
