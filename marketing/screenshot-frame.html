@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirlo Screenshot Frames - 1280x800</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #f5f5f5;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .screenshot-container {
+      width: 1280px;
+      height: 800px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      margin: 0 auto 60px auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+      position: relative;
+    }
+
+    /* Header with title */
+    .screenshot-header {
+      background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+      padding: 32px 48px;
+      position: relative;
+    }
+
+    .screenshot-number {
+      font-family: 'Manrope', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0 0 8px 0;
+      letter-spacing: 0.05em;
+    }
+
+    .screenshot-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: white;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    /* Screenshot area - this is where you'll place your actual screenshot */
+    .screenshot-area {
+      flex: 1;
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0 0 12px 12px;
+      min-height: 0; /* Important for flex children */
+    }
+
+    .screenshot-image {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screenshot-placeholder {
+      width: 100%;
+      height: 100%;
+      background: #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #64748b;
+      font-weight: 600;
+      border: 3px dashed #cbd5e1;
+    }
+
+    /* Caption at bottom */
+    .screenshot-caption {
+      background: rgba(15, 118, 110, 0.05);
+      padding: 24px 48px;
+      border-top: 2px solid rgba(15, 118, 110, 0.1);
+      position: relative;
+      z-index: 1;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .caption-text {
+      font-size: 18px;
+      color: #334155;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .caption-highlight {
+      font-weight: 700;
+      color: #0F766E;
+    }
+
+    /* Callout arrows/annotations */
+    .callout {
+      position: absolute;
+      background: #F97316;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .callout::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    /* Arrow pointing down */
+    .callout.arrow-down::after {
+      border-width: 12px 12px 0 12px;
+      border-color: #F97316 transparent transparent transparent;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Arrow pointing up */
+    .callout.arrow-up::after {
+      border-width: 0 12px 12px 12px;
+      border-color: transparent transparent #F97316 transparent;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Arrow pointing left */
+    .callout.arrow-left::after {
+      border-width: 12px 12px 12px 0;
+      border-color: transparent #F97316 transparent transparent;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Arrow pointing right */
+    .callout.arrow-right::after {
+      border-width: 12px 0 12px 12px;
+      border-color: transparent transparent transparent #F97316;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .instructions {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .instructions h2 {
+      font-family: 'Manrope', sans-serif;
+      color: #0F172A;
+      margin-top: 0;
+    }
+
+    .instructions ol {
+      line-height: 1.8;
+    }
+
+    .instructions code {
+      background: #F1F5F9;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .instructions strong {
+      color: #0F766E;
+    }
+
+    /* Page break for printing/export */
+    @media print {
+      .screenshot-container {
+        page-break-after: always;
+        margin-bottom: 0;
+      }
+      .instructions {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SCREENSHOT 1: Enable Mirlo -->
+  <div class="screenshot-container">
+    <div class="screenshot-header">
+      <p class="screenshot-number">STEP 1</p>
+      <h1 class="screenshot-title">Enable Mirlo on your favorite sites</h1>
+    </div>
+    <div class="screenshot-area">
+      <img src="./screenshots/raw/screen1.png" alt="Activation toast on a real website" class="screenshot-image">
+      <!-- Example callout - adjust position as needed -->
+       <div class="callout arrow-down" style="bottom: 130px; right: 220px;">
+        Click "Enable" to start learning
+      </div>
+  
+    </div>
+    <div class="screenshot-caption">
+      <p class="caption-text">
+        <span class="caption-highlight">Choose where you want to learn.</span>
+        Mirlo works on any website—news sites, blogs, Wikipedia, social media.
+      </p>
+    </div>
+  </div>
+
+  <!-- SCREENSHOT 2: Pick Your Language -->
+  <div class="screenshot-container">
+    <div class="screenshot-header">
+      <p class="screenshot-number">STEP 2</p>
+      <h1 class="screenshot-title">Choose your language pair</h1>
+    </div>
+    <div class="screenshot-area">
+      <img src="./screenshots/raw/screen2.png" alt="Options page with language dropdowns" class="screenshot-image">
+      <!-- Example callout -->
+      <div class="callout arrow-left" style="top: 45%; right: 100px;">
+        English, Spanish, French, or German
+      </div>
+    </div>
+    <div class="screenshot-caption">
+      <p class="caption-text">
+        <span class="caption-highlight">Select the language you're reading and the language you're learning.</span>
+        Settings sync across all your devices.
+      </p>
+    </div>
+  </div>
+
+  <!-- SCREENSHOT 3: Translate a Paragraph -->
+  <div class="screenshot-container">
+    <div class="screenshot-header">
+      <p class="screenshot-number">STEP 3</p>
+      <h1 class="screenshot-title">Click any paragraph for instant translation</h1>
+    </div>
+    <div class="screenshot-area">
+      <img src="./screenshots/raw/screen3.png" alt="Article with paragraph translated and tooltip visible" class="screenshot-image">
+      <!-- Example callout -->
+      <div class="callout arrow-down" style="top: 140px; left: 35%;">
+        100% local AI • No tracking
+      </div>
+    </div>
+    <div class="screenshot-caption">
+      <p class="caption-text">
+        <span class="caption-highlight">All translations happen on your device.</span>
+        Chrome's local AI means instant results with zero data collection.
+      </p>
+    </div>
+  </div>
+
+  <!-- SCREENSHOT 4: Toggle Back -->
+  <div class="screenshot-container">
+    <div class="screenshot-header">
+      <p class="screenshot-number">STEP 4</p>
+      <h1 class="screenshot-title">Toggle back to test your understanding</h1>
+    </div>
+    <div class="screenshot-area">
+      <div class="screenshot-placeholder">
+        📸 Place screenshot here: Same paragraph, tooltip showing "Switch to Spanish"<br>
+        (Show the toggle feature)
+      </div>
+      <!-- Example callout -->
+      <div class="callout arrow-down" style="top: 140px; left: 40%;">
+        Click again to see the original
+      </div>
+    </div>
+    <div class="screenshot-caption">
+      <p class="caption-text">
+        <span class="caption-highlight">Build real fluency through active learning.</span>
+        Read, translate, test yourself—all in the flow of authentic content.
+      </p>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <h2>📸 How to Create These Screenshots</h2>
+
+    <h3>Method 1: Replace Placeholders (Recommended)</h3>
+    <ol>
+      <li>Take 4 raw screenshots of the extension in action (see suggestions below)</li>
+      <li>Open this HTML file in a code editor</li>
+      <li>Replace each <code>&lt;div class="screenshot-placeholder"&gt;</code> with:
+        <pre style="background: #f1f5f9; padding: 12px; border-radius: 8px; margin-top: 8px;"><code>&lt;img src="screenshots/raw-01.png" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;"&gt;</code></pre>
+      </li>
+      <li>Adjust callout positions (change <code>top</code>, <code>left</code>, <code>right</code> values)</li>
+      <li>Use DevTools "Capture node screenshot" on each <code>.screenshot-container</code></li>
+      <li>Save as <code>01-enable-mirlo.png</code>, <code>02-choose-language.png</code>, etc.</li>
+    </ol>
+
+    <h3>Method 2: Manual Composition (Advanced)</h3>
+    <ol>
+      <li>Take clean screenshots without frames</li>
+      <li>Use Figma, Photoshop, or Canva to compose with the gradient headers and captions</li>
+      <li>Export at 1280x800px</li>
+    </ol>
+
+    <h3>What to Screenshot (Raw Images)</h3>
+
+    <p><strong>Screenshot 1: Activation Toast</strong></p>
+    <ul>
+      <li>Visit a Spanish news site (El País: elpais.com, BBC Mundo, etc.)</li>
+      <li>Extension should show activation toast: "Enable Mirlo on this site?"</li>
+      <li>Capture the whole browser window or just the article area with toast visible</li>
+    </ul>
+
+    <p><strong>Screenshot 2: Options Page</strong></p>
+    <ul>
+      <li>Open extension options (right-click icon → Options)</li>
+      <li>Show language dropdowns clearly</li>
+      <li>English → Spanish is a good default to show</li>
+      <li>Make sure the page looks polished (check for any dev artifacts)</li>
+    </ul>
+
+    <p><strong>Screenshot 3: Translation in Action</strong></p>
+    <ul>
+      <li>On a Spanish article, click a paragraph</li>
+      <li>Capture when the Mirlo tooltip is visible showing the English translation</li>
+      <li>Make sure the paragraph is highlighted/selected</li>
+      <li>Pick an interesting article (not Lorem Ipsum!)</li>
+      <li>Bonus: Use El País or a well-known Spanish publication for credibility</li>
+    </ul>
+
+    <p><strong>Screenshot 4: Toggle Feature</strong></p>
+    <ul>
+      <li>With a paragraph already translated, click it again</li>
+      <li>Show the tooltip with "Switch to Spanish" button</li>
+      <li>This demonstrates the toggle/test-yourself feature</li>
+    </ul>
+
+    <h3>Pro Tips</h3>
+    <ul>
+      <li><strong>Use real content:</strong> El País, BBC Mundo, Wikipedia ES—not test pages</li>
+      <li><strong>Pick interesting headlines:</strong> "Madrid celebra..." is better than "Lorem ipsum..."</li>
+      <li><strong>Clean browser:</strong> Close extra tabs, use a clean Chrome profile</li>
+      <li><strong>Consistent zoom:</strong> Keep browser at 100% zoom for all screenshots</li>
+      <li><strong>Professional sites:</strong> Well-known publications look more credible</li>
+      <li><strong>Good lighting:</strong> If you screenshot your screen, ensure even lighting (or just use DevTools capture)</li>
+    </ul>
+
+    <h3>Quick Alternative: Simple Screenshots</h3>
+    <p>
+      If the framed approach feels too complex, you can also submit <strong>simple, clean screenshots</strong>
+      of the extension in use at 1280x800px. Chrome Web Store accepts both annotated and clean screenshots.
+      The frames just add polish and guide the viewer's eye.
+    </p>
+
+    <p><strong>Need help?</strong> I can adjust callout positions, colors, or text once you have your raw screenshots!</p>
+  </div>
+
+</body>
+</html>

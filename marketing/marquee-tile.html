@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirlo Marquee Tile - 1400x560</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .marquee-tile {
+      width: 1400px;
+      height: 560px;
+      background: linear-gradient(135deg, #0F766E 0%, #14B8A6 40%, #F97316 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Decorative background elements */
+    .marquee-tile::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    .marquee-tile::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      left: 30%;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+    }
+
+    .content-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 80px;
+      z-index: 2;
+      gap: 60px;
+    }
+
+    /* Left side - Branding */
+    .branding-section {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .bird-container {
+      margin-bottom: 10px;
+    }
+
+    .bird-container img {
+      width: 180px;
+      height: 180px;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+    }
+
+    .app-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 72px;
+      font-weight: 800;
+      color: white;
+      margin: 0;
+      letter-spacing: -0.02em;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Right side - Messaging */
+    .message-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tagline {
+      font-family: 'Manrope', sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+      line-height: 1.3;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .benefit-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .cta-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 12px 0 0 0;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .instructions {
+      margin-top: 30px;
+      padding: 24px;
+      background: white;
+      border-radius: 12px;
+      max-width: 1400px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .instructions h3 {
+      margin-top: 0;
+      font-family: 'Manrope', sans-serif;
+      color: #0F172A;
+      font-size: 18px;
+    }
+
+    .instructions ol {
+      margin: 8px 0 0 0;
+      padding-left: 24px;
+      line-height: 1.8;
+    }
+
+    .instructions code {
+      background: #F1F5F9;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .instructions p {
+      margin: 12px 0 0 0;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .instructions strong {
+      color: #0F172A;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="marquee-tile">
+      <div class="content-wrapper">
+        <!-- Left: Branding -->
+        <div class="branding-section">
+          <div class="bird-container">
+            <img src="../src/assets/mirlo.png" alt="Mirlo Bird">
+          </div>
+          <h1 class="app-name">Mirlo</h1>
+        </div>
+
+        <!-- Right: Messaging -->
+        <div class="message-section">
+          <h2 class="tagline">Privacy-first language learning<br>for intermediate learners</h2>
+
+          <ul class="benefits-list">
+            <li class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span>Read real content with instant, local translations</span>
+            </li>
+            <li class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span>Zero tracking • No games • No upsells</span>
+            </li>
+            <li class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span>Open source • Free forever</span>
+            </li>
+          </ul>
+
+          <p class="cta-text">For learners ready to move beyond beginner apps</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <h3>📸 How to create your marquee tile (1400x560px):</h3>
+      <ol>
+        <li>This file should already be open in Chrome</li>
+        <li>Right-click on the colored tile → <strong>Inspect</strong></li>
+        <li>In DevTools Elements panel, find <code>&lt;div class="marquee-tile"&gt;</code></li>
+        <li>Right-click on it → <strong>"Capture node screenshot"</strong></li>
+        <li>Save as <code>marquee-tile-1400x560.png</code> in the marketing folder</li>
+        <li><strong>Convert to JPEG</strong> (Chrome Store requirement):
+          <ul style="margin-top: 8px;">
+            <li>Open PNG in Preview/Photoshop</li>
+            <li>Export as JPEG (quality 90-95%)</li>
+            <li>Or use: <code>sips -s format jpeg marquee-tile-1400x560.png --out marquee-tile-1400x560.jpg</code></li>
+          </ul>
+        </li>
+      </ol>
+      <p><strong>Note:</strong> Chrome Web Store requires JPEG or 24-bit PNG (no alpha/transparency). JPEG is recommended for this size.</p>
+      <p><strong>Alternative:</strong> Use macOS Screenshot (Cmd+Shift+4) and carefully select the entire tile.</p>
+    </div>
+  </div>
+</body>
+</html>

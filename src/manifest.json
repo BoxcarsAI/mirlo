@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Mirlo",
   "version": "0.1.0",
-  "description": "Privacy-first language learning highlights.",
+  "description": "Privacy-first language learning for intermediate learners. Read real content with instant, local translations. No tracking.",
   "action": {
     "default_title": "Mirlo",
     "default_popup": "popup.html",
@@ -24,7 +24,7 @@
     "48": "assets/mirlo-48.png",
     "128": "assets/mirlo-128.png"
   },
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "storage"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
