@@ -3,15 +3,15 @@ const languageEl = document.getElementById("page-language");
 const domainEl = document.getElementById("site-domain");
 const siteStatusEl = document.getElementById("site-status");
 const toggleButton = document.getElementById("toggle-site");
-const sourceLangEl = document.getElementById("source-lang");
-const targetLangEl = document.getElementById("target-lang");
+const nativeLangEl = document.getElementById("native-lang");
+const learningLangEl = document.getElementById("learning-lang");
 const optionsLink = document.getElementById("open-options");
 
 const STORAGE_KEYS = {
   enabledDomains: "mirlo:enabled_domains",
   dismissedDomains: "mirlo:dismissed_domains",
-  sourceLanguage: "mirlo:source_language",
-  targetLanguage: "mirlo:target_language"
+  nativeLanguage: "mirlo:native_language",
+  learningLanguage: "mirlo:learning_language"
 };
 
 let currentDomain = "";
@@ -31,15 +31,15 @@ function getLanguageName(code) {
 function loadLanguagePreferences() {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
-      resolve({ source: "en", target: "es" });
+      resolve({ native: "en", learning: "es" });
       return;
     }
     chrome.storage.sync.get(
-      [STORAGE_KEYS.sourceLanguage, STORAGE_KEYS.targetLanguage],
+      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
       (result) => {
         resolve({
-          source: result?.[STORAGE_KEYS.sourceLanguage] || "en",
-          target: result?.[STORAGE_KEYS.targetLanguage] || "es"
+          native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
+          learning: result?.[STORAGE_KEYS.learningLanguage] || "es"
         });
       }
     );
@@ -155,8 +155,8 @@ async function initializePopup(tab) {
   currentDomain = getDomainFromUrl(tab?.url);
 
   const languages = await loadLanguagePreferences();
-  if (sourceLangEl) sourceLangEl.textContent = getLanguageName(languages.source);
-  if (targetLangEl) targetLangEl.textContent = getLanguageName(languages.target);
+  if (nativeLangEl) nativeLangEl.textContent = getLanguageName(languages.native);
+  if (learningLangEl) learningLangEl.textContent = getLanguageName(languages.learning);
 
   if (!currentDomain) {
     setSiteUi({ domain: "Site unavailable", enabled: false, toggleDisabled: true });

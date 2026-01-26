@@ -1,42 +1,42 @@
 const STORAGE_KEYS = {
-  sourceLanguage: "mirlo:source_language",
-  targetLanguage: "mirlo:target_language"
+  nativeLanguage: "mirlo:native_language",
+  learningLanguage: "mirlo:learning_language"
 };
 
-const DEFAULT_SOURCE = "en";
-const DEFAULT_TARGET = "es";
+const DEFAULT_NATIVE = "en";
+const DEFAULT_LEARNING = "es";
 
-const sourceSelect = document.getElementById("source-language");
-const targetSelect = document.getElementById("target-language");
+const nativeSelect = document.getElementById("native-language");
+const learningSelect = document.getElementById("learning-language");
 const saveButton = document.getElementById("save-button");
 const statusEl = document.getElementById("save-status");
 
 function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(
-      [STORAGE_KEYS.sourceLanguage, STORAGE_KEYS.targetLanguage],
+      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
       (result) => {
         if (chrome.runtime.lastError) {
           console.error("Storage read error:", chrome.runtime.lastError);
-          resolve({ source: DEFAULT_SOURCE, target: DEFAULT_TARGET });
+          resolve({ native: DEFAULT_NATIVE, learning: DEFAULT_LEARNING });
           return;
         }
 
         resolve({
-          source: result[STORAGE_KEYS.sourceLanguage] || DEFAULT_SOURCE,
-          target: result[STORAGE_KEYS.targetLanguage] || DEFAULT_TARGET
+          native: result[STORAGE_KEYS.nativeLanguage] || DEFAULT_NATIVE,
+          learning: result[STORAGE_KEYS.learningLanguage] || DEFAULT_LEARNING
         });
       }
     );
   });
 }
 
-function saveSettings(source, target) {
+function saveSettings(native, learning) {
   return new Promise((resolve) => {
     chrome.storage.sync.set(
       {
-        [STORAGE_KEYS.sourceLanguage]: source,
-        [STORAGE_KEYS.targetLanguage]: target
+        [STORAGE_KEYS.nativeLanguage]: native,
+        [STORAGE_KEYS.learningLanguage]: learning
       },
       () => {
         if (chrome.runtime.lastError) {
@@ -60,11 +60,11 @@ function showStatus(message, type) {
   }, 2500);
 }
 
-function validateLanguages(source, target) {
-  if (source === target) {
+function validateLanguages(native, learning) {
+  if (native === learning) {
     return {
       valid: false,
-      message: "Source and target languages must be different."
+      message: "Native and learning languages must be different."
     };
   }
   return { valid: true };
@@ -72,15 +72,15 @@ function validateLanguages(source, target) {
 
 async function init() {
   const settings = await getSettings();
-  sourceSelect.value = settings.source;
-  targetSelect.value = settings.target;
+  nativeSelect.value = settings.native;
+  learningSelect.value = settings.learning;
 }
 
 saveButton.addEventListener("click", async () => {
-  const source = sourceSelect.value;
-  const target = targetSelect.value;
+  const native = nativeSelect.value;
+  const learning = learningSelect.value;
 
-  const validation = validateLanguages(source, target);
+  const validation = validateLanguages(native, learning);
   if (!validation.valid) {
     showStatus(validation.message, "error");
     return;
@@ -89,7 +89,7 @@ saveButton.addEventListener("click", async () => {
   saveButton.disabled = true;
   saveButton.textContent = "Saving...";
 
-  const saved = await saveSettings(source, target);
+  const saved = await saveSettings(native, learning);
 
   if (saved) {
     showStatus("✓ Settings saved successfully!", "success");

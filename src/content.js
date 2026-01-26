@@ -35,8 +35,8 @@
   const STORAGE_KEYS = {
     enabledDomains: "mirlo:enabled_domains",
     dismissedDomains: "mirlo:dismissed_domains",
-    sourceLanguage: "mirlo:source_language",
-    targetLanguage: "mirlo:target_language"
+    nativeLanguage: "mirlo:native_language",
+    learningLanguage: "mirlo:learning_language"
   };
   const TOAST_AUTO_DISMISS_MS = 8000;
 
@@ -53,8 +53,8 @@
   let listenersBound = false;
   let activationToastEl = null;
   let activationDismissTimer = null;
-  let userSourceLanguage = "en";
-  let userTargetLanguage = "es";
+  let userNativeLanguage = "en";
+  let userLearningLanguage = "es";
   const MARKER_TEXT = "·";
 
   function getHtmlLanguage() {
@@ -146,14 +146,22 @@
     };
   }
 
-  function getSourceLanguage() {
-    return userSourceLanguage || "en";
-  }
-
   function getNormalizedPageLanguage() {
     const htmlLang = getHtmlLanguage();
     if (!htmlLang) return "";
     return htmlLang.split("-")[0].toLowerCase();
+  }
+
+  function getLanguagePairForPage() {
+    const pageLanguage = getNormalizedPageLanguage();
+    if (!pageLanguage) return null;
+    if (pageLanguage === userNativeLanguage) {
+      return { sourceLanguage: userNativeLanguage, targetLanguage: userLearningLanguage };
+    }
+    if (pageLanguage === userLearningLanguage) {
+      return { sourceLanguage: userLearningLanguage, targetLanguage: userNativeLanguage };
+    }
+    return null;
   }
 
   function getLanguageName(code) {
@@ -169,15 +177,15 @@
   async function getLanguagePreferences() {
     return new Promise((resolve) => {
       if (!chrome?.storage?.sync) {
-        resolve({ source: "en", target: "es" });
+        resolve({ native: "en", learning: "es" });
         return;
       }
       chrome.storage.sync.get(
-        [STORAGE_KEYS.sourceLanguage, STORAGE_KEYS.targetLanguage],
+        [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
         (result) => {
           resolve({
-            source: result?.[STORAGE_KEYS.sourceLanguage] || "en",
-            target: result?.[STORAGE_KEYS.targetLanguage] || "es"
+            native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
+            learning: result?.[STORAGE_KEYS.learningLanguage] || "es"
           });
         }
       );
@@ -186,8 +194,8 @@
 
   async function initializeLanguageSettings() {
     const prefs = await getLanguagePreferences();
-    userSourceLanguage = prefs.source;
-    userTargetLanguage = prefs.target;
+    userNativeLanguage = prefs.native;
+    userLearningLanguage = prefs.learning;
   }
 
   function getWordCount(text) {
@@ -444,8 +452,11 @@
       return;
     }
 
-    const sourceLanguage = getSourceLanguage();
-    const targetLanguage = userTargetLanguage;
+    const languagePair = getLanguagePairForPage();
+    if (!languagePair) {
+      return;
+    }
+    const { sourceLanguage, targetLanguage } = languagePair;
 
     try {
       const availability = await self.Translator.availability({
@@ -589,8 +600,8 @@
     const state = paragraph.dataset.mirloState || "translated";
     const original = paragraph.dataset.mirloOriginal || "";
     const translated = paragraph.dataset.mirloTranslated || "";
-    const sourceLang = paragraph.dataset.mirloSource || userSourceLanguage;
-    const targetLang = paragraph.dataset.mirloTarget || userTargetLanguage;
+    const sourceLang = paragraph.dataset.mirloSource || userNativeLanguage;
+    const targetLang = paragraph.dataset.mirloTarget || userLearningLanguage;
 
     titleEl.textContent =
       state === "translated" ? getLanguageName(targetLang) : getLanguageName(sourceLang);
@@ -769,9 +780,9 @@
     const stored = await getStoredDomains();
     if (stored.enabled.includes(domain)) {
       const pageLanguage = getNormalizedPageLanguage();
-      if (pageLanguage !== userSourceLanguage) {
+      if (pageLanguage !== userNativeLanguage && pageLanguage !== userLearningLanguage) {
         console.log(
-          `Page language (${pageLanguage}) doesn't match source (${userSourceLanguage})`
+          `Page language (${pageLanguage}) doesn't match native/learning (${userNativeLanguage}/${userLearningLanguage})`
         );
         return;
       }
@@ -781,7 +792,7 @@
     if (stored.dismissed.includes(domain)) return;
     if (!isArticleLike()) return;
     const pageLanguage = getNormalizedPageLanguage();
-    if (pageLanguage !== userSourceLanguage) {
+    if (pageLanguage !== userNativeLanguage && pageLanguage !== userLearningLanguage) {
       return;
     }
     showActivationToast(domain);
