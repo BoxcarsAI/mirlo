@@ -354,6 +354,24 @@ Mirlo's strength is authenticity. Don't oversell. Don't hide limitations. Trust 
 If you stay true to "privacy-first, intermediate-focused, no-BS," the messaging will work.
 
 
+## Store Privacy tab
+
+Privacy‑first language learning powered by Chrome’s new on‑device AI APIs.
+
+activeTab
+Required to access only the currently active page when the user clicks the extension so Mirlo can translate a paragraph on that page. No background access.
+
+scripting
+Required to inject Mirlo’s translation UI and click‑to‑translate behavior into the page the user is reading.
+
+storage
+Required to store the user’s language preferences locally (source/target language). No cloud storage, no accounts.
+
+host
+Mirlo is designed to work on any website the user chooses to read (news, blogs, social media, Wikipedia, etc.). Host access allows the content script to run on whatever site the user visits so paragraph translation works everywhere. No tracking or data collection.
+
+https://www.boxcars.ai/mirlo-privacy-policy/
+
 ## Chrome Web Store Description
 
 You've finished the beginner apps. You can handle basic conversations. But when you try to read real articles in your target language, you're lost.
@@ -405,7 +423,3 @@ Open source code available on GitHub.
 - English ↔ German
 
 Starting with languages that work reliably with Chrome's local translation API. More languages coming based on user feedback.
-
----
-
-Built by Tabrez, a fellow intermediate learner who got tired of apps that either treated him like a beginner or tracked his every move.
