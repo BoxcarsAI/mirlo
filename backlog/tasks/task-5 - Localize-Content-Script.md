@@ -1,10 +1,10 @@
 ---
 id: TASK-5
 title: Localize Content Script
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-01-29 15:32'
-updated_date: '2026-01-29 16:55'
+updated_date: '2026-01-29 17:12'
 labels: []
 dependencies:
   - TASK-1
@@ -20,9 +20,9 @@ Update the content script to use localized strings for injected UI elements (too
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 content.js (and any related injected scripts) uses chrome.i18n.getMessage for all text
-- [ ] #2 All extracted strings are added to _locales/en/messages.json
-- [ ] #3 In-page translation UI renders correctly in English
+- [x] #1 content.js (and any related injected scripts) uses chrome.i18n.getMessage for all text
+- [x] #2 All extracted strings are added to _locales/en/messages.json
+- [x] #3 In-page translation UI renders correctly in English
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -43,3 +43,9 @@ Update the content script to use localized strings for injected UI elements (too
     *   Verify the "Enable Mirlo" toast appears with correct English text.
     *   Verify tooltips show correct English text.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Successfully localized the content script (`src/content.js`). Extracted all UI strings (activation toast, translation badge tooltip, and translation popover) into `src/_locales/en/messages.json`. Refactored `getLanguageName` to use i18n keys and updated DOM manipulation to use `textContent` for security when injecting localized strings. Verified the implementation with `codebase_investigator`, confirming no hardcoded strings remain and XSS risks are mitigated.
+<!-- SECTION:FINAL_SUMMARY:END -->

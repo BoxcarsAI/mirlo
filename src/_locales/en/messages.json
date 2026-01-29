@@ -184,5 +184,35 @@
   "langDeFull": {
     "message": "🇩🇪 German",
     "description": "German with flag"
+  },
+  "contentBadgeTitle": {
+    "message": "Translate with Mirlo",
+    "description": "Tooltip/Aria label for the translation badge"
+  },
+  "contentSwitchTo": {
+    "message": "Switch to $LANG$",
+    "description": "Button text to switch language",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentEnableOnDomain": {
+    "message": "Enable Mirlo on $DOMAIN$?",
+    "description": "Toast title asking to enable on a specific domain",
+    "placeholders": {
+      "domain": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentEnable": {
+    "message": "Enable",
+    "description": "Button to enable on domain"
+  },
+  "contentNotNow": {
+    "message": "Not now",
+    "description": "Button to dismiss enable toast"
   }
 }

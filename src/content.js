@@ -165,13 +165,17 @@
   }
 
   function getLanguageName(code) {
-    const names = {
-      en: "English",
-      es: "Spanish",
-      fr: "French",
-      de: "German"
+    const keys = {
+      en: "langEn",
+      es: "langEs",
+      fr: "langFr",
+      de: "langDe"
     };
-    return names[code] || (code ? code.toUpperCase() : "");
+    const key = keys[code];
+    if (key) {
+      return chrome.i18n.getMessage(key);
+    }
+    return code ? code.toUpperCase() : "";
   }
 
   async function getLanguagePreferences() {
@@ -506,8 +510,8 @@
     tooltipEl.className = "mirlo-tooltip";
     tooltipEl.innerHTML = `
       <div class="mirlo-tooltip-header">
-        <div class="mirlo-tooltip-title">Spanish</div>
-        <button class="mirlo-tooltip-button" type="button">Revert to English</button>
+        <div class="mirlo-tooltip-title"></div>
+        <button class="mirlo-tooltip-button" type="button"></button>
       </div>
       <div class="mirlo-tooltip-body"></div>
     `;
@@ -524,11 +528,12 @@
 
   function ensureBadge() {
     if (badgeEl) return badgeEl;
+    const badgeTitle = chrome.i18n.getMessage("contentBadgeTitle");
     badgeEl = document.createElement("button");
     badgeEl.type = "button";
     badgeEl.className = "mirlo-badge";
-    badgeEl.title = "Translate with Mirlo";
-    badgeEl.setAttribute("aria-label", "Translate with Mirlo");
+    badgeEl.title = badgeTitle;
+    badgeEl.setAttribute("aria-label", badgeTitle);
     badgeEl.innerHTML = `
       <svg class="mirlo-glyph" viewBox="0 0 1280 923" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
         <g transform="translate(0,923) scale(0.1,-0.1)" fill="#1a1a1a" stroke="none">
@@ -603,13 +608,15 @@
     const sourceLang = paragraph.dataset.mirloSource || userNativeLanguage;
     const targetLang = paragraph.dataset.mirloTarget || userLearningLanguage;
 
+    const nextLangName =
+      state === "translated"
+        ? getLanguageName(sourceLang)
+        : getLanguageName(targetLang);
+
     titleEl.textContent =
       state === "translated" ? getLanguageName(targetLang) : getLanguageName(sourceLang);
     bodyEl.textContent = state === "translated" ? original : translated;
-    button.textContent =
-      state === "translated"
-        ? `Switch to ${getLanguageName(sourceLang)}`
-        : `Switch to ${getLanguageName(targetLang)}`;
+    button.textContent = chrome.i18n.getMessage("contentSwitchTo", [nextLangName]);
     button.onclick = () => toggleParagraphState(paragraph);
 
     positionTooltip(paragraph, tooltip);
@@ -727,16 +734,22 @@
     activationToastEl.innerHTML = `
       <div class="mirlo-toast-icon">🌐</div>
       <div class="mirlo-toast-content">
-        <div class="mirlo-toast-title">Enable Mirlo on ${domain}?</div>
+        <div class="mirlo-toast-title"></div>
         <div class="mirlo-toast-actions">
-          <button class="mirlo-toast-button is-primary" type="button">Enable</button>
-          <button class="mirlo-toast-button" type="button">Not now</button>
+          <button class="mirlo-toast-button is-primary" type="button"></button>
+          <button class="mirlo-toast-button" type="button"></button>
         </div>
       </div>
     `;
 
+    activationToastEl.querySelector(".mirlo-toast-title").textContent =
+      chrome.i18n.getMessage("contentEnableOnDomain", [domain]);
+
     const [enableButton, dismissButton] =
       activationToastEl.querySelectorAll(".mirlo-toast-button");
+    
+    enableButton.textContent = chrome.i18n.getMessage("contentEnable");
+    dismissButton.textContent = chrome.i18n.getMessage("contentNotNow");
 
     const cleanupTimers = () => {
       if (activationDismissTimer) {
