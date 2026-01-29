@@ -10,5 +10,103 @@
   "actionTitle": {
     "message": "Mirlo",
     "description": "The title of the extension action (hover tooltip)"
+  },
+  "popupLoadingSite": {
+    "message": "Loading site…",
+    "description": "Initial text while checking the current site"
+  },
+  "popupStatusEnabled": {
+    "message": "✓ Enabled",
+    "description": "Status badge when extension is enabled"
+  },
+  "popupStatusDisabled": {
+    "message": "Disabled",
+    "description": "Status badge when extension is disabled"
+  },
+  "popupEnableBtn": {
+    "message": "Enable",
+    "description": "Button text to enable the extension"
+  },
+  "popupDisableBtn": {
+    "message": "Disable",
+    "description": "Button text to disable the extension"
+  },
+  "popupChangeLanguages": {
+    "message": "Change languages →",
+    "description": "Link to options page"
+  },
+  "popupAiStatusFormat": {
+    "message": "AI Status: $STATUS$",
+    "description": "Format for AI status line",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupPageLangFormat": {
+    "message": "Page Language: $LANG$",
+    "description": "Format for page language line",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupSiteUnavailable": {
+    "message": "Site unavailable",
+    "description": "Status when site cannot be accessed"
+  },
+  "popupNoActiveTab": {
+    "message": "No active tab",
+    "description": "Status when no tab is active"
+  },
+  "popupUnknown": {
+    "message": "Unknown",
+    "description": "Unknown language or status"
+  },
+  "popupNotSupported": {
+    "message": "Not Supported",
+    "description": "AI features not supported status"
+  },
+  "popupDetectorUnsupported": {
+    "message": "LanguageDetector unsupported",
+    "description": "Status detail when detector is missing"
+  },
+  "popupTranslationSupported": {
+    "message": "Translation supported",
+    "description": "Status detail when translation is available"
+  },
+  "popupTranslationUnsupported": {
+    "message": "Translation unsupported",
+    "description": "Status detail when translation is missing"
+  },
+  "popupAiStatusInit": {
+    "message": "AI Status: Checking…",
+    "description": "Initial text for AI status"
+  },
+  "popupPageLangInit": {
+    "message": "Page Language: Checking…",
+    "description": "Initial text for page language"
+  },
+  "popupDetectorPrefix": {
+    "message": "LanguageDetector",
+    "description": "Prefix for detector status"
+  },
+  "langEn": {
+    "message": "English",
+    "description": "Language name for English"
+  },
+  "langEs": {
+    "message": "Spanish",
+    "description": "Language name for Spanish"
+  },
+  "langFr": {
+    "message": "French",
+    "description": "Language name for French"
+  },
+  "langDe": {
+    "message": "German",
+    "description": "Language name for German"
   }
 }

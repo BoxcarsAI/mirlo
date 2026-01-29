@@ -1,10 +1,10 @@
 ---
 id: TASK-3
 title: Localize Popup UI
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-01-29 15:32'
-updated_date: '2026-01-29 15:40'
+updated_date: '2026-01-29 16:07'
 labels: []
 dependencies:
   - TASK-2
@@ -19,11 +19,11 @@ Extract all hardcoded strings from `popup.html` and `popup.js` into the English 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 No hardcoded user-facing strings remain in popup.html
-- [ ] #2 popup.html uses data-i18n attributes for static text
-- [ ] #3 popup.js uses chrome.i18n.getMessage for any dynamic text
-- [ ] #4 All extracted strings are added to _locales/en/messages.json
-- [ ] #5 The popup renders correctly in English
+- [x] #1 No hardcoded user-facing strings remain in popup.html
+- [x] #2 popup.html uses data-i18n attributes for static text
+- [x] #3 popup.js uses chrome.i18n.getMessage for any dynamic text
+- [x] #4 All extracted strings are added to _locales/en/messages.json
+- [x] #5 The popup renders correctly in English
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -48,3 +48,22 @@ Extract all hardcoded strings from `popup.html` and `popup.js` into the English 
     *   Verify popup text matches English strings.
     *   Toggle "Enable/Disable" to ensure dynamic text updates correctly.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Completed Task 3: Localize Popup UI.
+
+**Changes:**
+- Extracted all hardcoded strings from `src/popup.html` and `src/popup.js` to `src/_locales/en/messages.json`.
+- Updated `src/popup.html` to use `data-i18n` attributes for static text, including initial status states.
+- Updated `src/popup.js` to use `chrome.i18n.getMessage()` for dynamic text (status updates, buttons, language names).
+- Localized the "LanguageDetector" technical prefix.
+- Ensured `formatLanguage` uses localized language names via `getLanguageName`.
+- Removed unused `popupChecking` key.
+
+**Verification:**
+- User verified the popup renders correctly in English.
+- User verified dynamic string updates (e.g., button text) by modifying `messages.json` and reloading.
+- Codebase investigator review passed after fixing identified issues (hardcoded initial HTML states, raw language codes).
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -20,10 +20,10 @@ let currentTabId = null;
 
 function getLanguageName(code) {
   const names = {
-    en: "English",
-    es: "Spanish",
-    fr: "French",
-    de: "German"
+    en: chrome.i18n.getMessage("langEn"),
+    es: chrome.i18n.getMessage("langEs"),
+    fr: chrome.i18n.getMessage("langFr"),
+    de: chrome.i18n.getMessage("langDe")
   };
   return names[code] || (code ? code.toUpperCase() : "");
 }
@@ -47,29 +47,31 @@ function loadLanguagePreferences() {
 }
 
 function formatLanguage(info) {
-  if (!info) return "Unknown";
+  if (!info) return chrome.i18n.getMessage("popupUnknown");
   if (info.detectorResult?.detectedLanguage) {
     const confidence = Math.round(info.detectorResult.confidence * 100);
-    return `${info.detectorResult.detectedLanguage} (${confidence}%)`;
+    const langName = getLanguageName(info.detectorResult.detectedLanguage);
+    return `${langName} (${confidence}%)`;
   }
-  if (info.htmlLang) return info.htmlLang;
-  return "Unknown";
+  if (info.htmlLang) return getLanguageName(info.htmlLang);
+  return chrome.i18n.getMessage("popupUnknown");
 }
 
 function formatAiStatus(info) {
-  if (!info) return "Not Supported";
+  if (!info) return chrome.i18n.getMessage("popupNotSupported");
+  const detectorPrefix = chrome.i18n.getMessage("popupDetectorPrefix");
   const detector = info.detectorSupported
-    ? `LanguageDetector ${info.detectorAvailability}`
-    : "LanguageDetector unsupported";
+    ? `${detectorPrefix} ${info.detectorAvailability}`
+    : chrome.i18n.getMessage("popupDetectorUnsupported");
   const translation = info.translationSupported
-    ? "Translation supported"
-    : "Translation unsupported";
+    ? chrome.i18n.getMessage("popupTranslationSupported")
+    : chrome.i18n.getMessage("popupTranslationUnsupported");
   return `${detector}; ${translation}`;
 }
 
 function updateUi(info) {
-  statusEl.textContent = `AI Status: ${formatAiStatus(info)}`;
-  languageEl.textContent = `Page Language: ${formatLanguage(info)}`;
+  statusEl.textContent = chrome.i18n.getMessage("popupAiStatusFormat", [formatAiStatus(info)]);
+  languageEl.textContent = chrome.i18n.getMessage("popupPageLangFormat", [formatLanguage(info)]);
 }
 
 function normalizeDomain(hostname) {
@@ -141,11 +143,15 @@ async function setDomainEnabled(domain, enabled) {
 }
 
 function setSiteUi({ domain, enabled, toggleDisabled }) {
-  domainEl.textContent = domain ? domain : "Site unavailable";
+  domainEl.textContent = domain ? domain : chrome.i18n.getMessage("popupSiteUnavailable");
   currentEnabled = Boolean(enabled);
-  siteStatusEl.textContent = currentEnabled ? "✓ Enabled" : "Disabled";
+  siteStatusEl.textContent = currentEnabled
+    ? chrome.i18n.getMessage("popupStatusEnabled")
+    : chrome.i18n.getMessage("popupStatusDisabled");
   siteStatusEl.classList.toggle("is-disabled", !currentEnabled);
-  toggleButton.textContent = currentEnabled ? "Disable" : "Enable";
+  toggleButton.textContent = currentEnabled
+    ? chrome.i18n.getMessage("popupDisableBtn")
+    : chrome.i18n.getMessage("popupEnableBtn");
   toggleButton.classList.toggle("is-primary", !currentEnabled);
   toggleButton.disabled = Boolean(toggleDisabled);
 }
@@ -159,7 +165,7 @@ async function initializePopup(tab) {
   if (learningLangEl) learningLangEl.textContent = getLanguageName(languages.learning);
 
   if (!currentDomain) {
-    setSiteUi({ domain: "Site unavailable", enabled: false, toggleDisabled: true });
+    setSiteUi({ domain: chrome.i18n.getMessage("popupSiteUnavailable"), enabled: false, toggleDisabled: true });
     updateUi(null);
     return;
   }
@@ -207,7 +213,7 @@ optionsLink?.addEventListener("click", (event) => {
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const tab = tabs && tabs[0];
   if (!tab?.id) {
-    setSiteUi({ domain: "No active tab", enabled: false, toggleDisabled: true });
+    setSiteUi({ domain: chrome.i18n.getMessage("popupNoActiveTab"), enabled: false, toggleDisabled: true });
     updateUi(null);
     return;
   }

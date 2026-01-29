@@ -103,11 +103,11 @@
     </style>
   </head>
   <body>
-    <h1>Mirlo</h1>
-    <div class="domain" id="site-domain">Loading site…</div>
+    <h1 data-i18n="appName">Mirlo</h1>
+    <div class="domain" id="site-domain" data-i18n="popupLoadingSite">Loading site…</div>
     <div class="site-row">
-      <div class="status-pill" id="site-status">✓ Enabled</div>
-      <button class="toggle-button" id="toggle-site" type="button">Disable</button>
+      <div class="status-pill" id="site-status" data-i18n="popupStatusEnabled">✓ Enabled</div>
+      <button class="toggle-button" id="toggle-site" type="button" data-i18n="popupDisableBtn">Disable</button>
     </div>
     <div class="language-info">
       <div class="language-pair">
@@ -118,10 +118,11 @@
     </div>
     <div class="divider"></div>
     <p class="meta-line">
-      <a href="#" id="open-options" class="options-link">Change languages →</a>
+      <a href="#" id="open-options" class="options-link" data-i18n="popupChangeLanguages">Change languages →</a>
     </p>
-    <p class="meta-line" id="ai-status">AI Status: Checking…</p>
-    <p class="meta-line" id="page-language">Page Language: Checking…</p>
+    <p class="meta-line" id="ai-status" data-i18n="popupAiStatusInit">AI Status: Checking…</p>
+    <p class="meta-line" id="page-language" data-i18n="popupPageLangInit">Page Language: Checking…</p>
+    <script src="utils/i18n.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>
