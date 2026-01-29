@@ -59,7 +59,7 @@ To ensure high-quality output and context management, explicitly operate in one 
     2.  Read the task's `Implementation Plan`.
     3.  **Implement:** Write code (`write_file`, `replace`) and run tests (`run_shell_command`).
     4.  **Verify:** Run automated tests to ensure correctness.
-    5.  **Review:** Run `git diff` to review the full changeset. Analyze for bugs, security issues, and style consistency. If issues are found, fix them immediately.
+    5.  **Delegated Review:** Call `delegate_to_agent(codebase_investigator)` with a specific objective: "Review the changes in [files] for: 1. Consistency with project patterns, 2. Security vulnerabilities, 3. Logic errors, 4. Adherence to the implementation plan." **Fix any issues found immediately.**
     6.  **Finalize:** Mark task as `Done` only after the review passes.
     7.  **STOP** and await further instructions (do not auto-advance to the next task).
 - **Output:** Modified codebase and completed task.
