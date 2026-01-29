@@ -4,7 +4,7 @@
     "description": "The name of the extension"
   },
   "appDesc": {
-    "message": "Privacy-first language learning for intermediate learners. Read real content with instant, local translations. No tracking.",
+    "message": "Aprendizaje de idiomas priorizando la privacidad para estudiantes intermedios. Lee contenido real con traducciones instantáneas y locales. Sin rastreo.",
     "description": "The description of the extension shown in the store and extensions page"
   },
   "actionTitle": {
@@ -12,31 +12,31 @@
     "description": "The title of the extension action (hover tooltip)"
   },
   "popupLoadingSite": {
-    "message": "Loading site…",
+    "message": "Cargando sitio…",
     "description": "Initial text while checking the current site"
   },
   "popupStatusEnabled": {
-    "message": "✓ Enabled",
+    "message": "✓ Activado",
     "description": "Status badge when extension is enabled"
   },
   "popupStatusDisabled": {
-    "message": "Disabled",
+    "message": "Desactivado",
     "description": "Status badge when extension is disabled"
   },
   "popupEnableBtn": {
-    "message": "Enable",
+    "message": "Activar",
     "description": "Button text to enable the extension"
   },
   "popupDisableBtn": {
-    "message": "Disable",
+    "message": "Desactivar",
     "description": "Button text to disable the extension"
   },
   "popupChangeLanguages": {
-    "message": "Change languages →",
+    "message": "Cambiar idiomas →",
     "description": "Link to options page"
   },
   "popupAiStatusFormat": {
-    "message": "AI Status: $STATUS$",
+    "message": "Estado de IA: $STATUS$",
     "description": "Format for AI status line",
     "placeholders": {
       "status": {
@@ -45,7 +45,7 @@
     }
   },
   "popupPageLangFormat": {
-    "message": "Page Language: $LANG$",
+    "message": "Idioma de la página: $LANG$",
     "description": "Format for page language line",
     "placeholders": {
       "lang": {
@@ -54,39 +54,39 @@
     }
   },
   "popupSiteUnavailable": {
-    "message": "Site unavailable",
+    "message": "Sitio no disponible",
     "description": "Status when site cannot be accessed"
   },
   "popupNoActiveTab": {
-    "message": "No active tab",
+    "message": "Sin pestaña activa",
     "description": "Status when no tab is active"
   },
   "popupUnknown": {
-    "message": "Unknown",
+    "message": "Desconocido",
     "description": "Unknown language or status"
   },
   "popupNotSupported": {
-    "message": "Not Supported",
+    "message": "No compatible",
     "description": "AI features not supported status"
   },
   "popupDetectorUnsupported": {
-    "message": "LanguageDetector unsupported",
+    "message": "LanguageDetector no compatible",
     "description": "Status detail when detector is missing"
   },
   "popupTranslationSupported": {
-    "message": "Translation supported",
+    "message": "Traducción compatible",
     "description": "Status detail when translation is available"
   },
   "popupTranslationUnsupported": {
-    "message": "Translation unsupported",
+    "message": "Traducción no compatible",
     "description": "Status detail when translation is missing"
   },
   "popupAiStatusInit": {
-    "message": "AI Status: Checking…",
+    "message": "Estado de IA: Comprobando…",
     "description": "Initial text for AI status"
   },
   "popupPageLangInit": {
-    "message": "Page Language: Checking…",
+    "message": "Idioma de la página: Comprobando…",
     "description": "Initial text for page language"
   },
   "popupDetectorPrefix": {
@@ -94,107 +94,107 @@
     "description": "Prefix for detector status"
   },
   "langEn": {
-    "message": "English",
+    "message": "Inglés",
     "description": "Language name for English"
   },
   "langEs": {
-    "message": "Spanish",
+    "message": "Español",
     "description": "Language name for Spanish"
   },
   "langFr": {
-    "message": "French",
+    "message": "Francés",
     "description": "Language name for French"
   },
   "langDe": {
-    "message": "German",
+    "message": "Alemán",
     "description": "Language name for German"
   },
   "optionsTitle": {
-    "message": "Mirlo Options",
+    "message": "Opciones de Mirlo",
     "description": "Page title for options"
   },
   "optionsHeroAlt": {
-    "message": "Mirlo bird with colorful language characters",
+    "message": "Pájaro Mirlo con caracteres de idiomas coloridos",
     "description": "Alt text for hero banner"
   },
   "optionsSettingsTitle": {
-    "message": "Mirlo Settings",
+    "message": "Ajustes de Mirlo",
     "description": "Main title on options page"
   },
   "optionsSettingsSubtitle": {
-    "message": "Learn languages naturally",
+    "message": "Aprende idiomas de forma natural",
     "description": "Subtitle on options page"
   },
   "optionsPreferencesTitle": {
-    "message": "Language Preferences",
+    "message": "Preferencias de idioma",
     "description": "Section title for language selection"
   },
   "optionsAriaLabel": {
-    "message": "Mirlo language preferences",
+    "message": "Preferencias de idioma de Mirlo",
     "description": "Aria label for the language preferences form"
   },
   "optionsNativeLabel": {
-    "message": "Native Language",
+    "message": "Idioma nativo",
     "description": "Label for native language select"
   },
   "optionsNativeHint": {
-    "message": "The language you know best",
+    "message": "El idioma que mejor conoces",
     "description": "Hint for native language select"
   },
   "optionsLearningLabel": {
-    "message": "Learning Language",
+    "message": "Idioma de aprendizaje",
     "description": "Label for learning language select"
   },
   "optionsLearningHint": {
-    "message": "The language you want to learn",
+    "message": "El idioma que quieres aprender",
     "description": "Hint for learning language select"
   },
   "optionsSaveBtn": {
-    "message": "Save Settings",
+    "message": "Guardar ajustes",
     "description": "Button to save settings"
   },
   "optionsSaveStatusSaving": {
-    "message": "Saving...",
+    "message": "Guardando...",
     "description": "Status message when saving"
   },
   "optionsSaveStatusSaved": {
-    "message": "Saved!",
+    "message": "¡Guardado!",
     "description": "Button text after successful save"
   },
   "optionsSaveStatusSuccess": {
-    "message": "✓ Settings saved successfully!",
+    "message": "✓ ¡Ajustes guardados correctamente!",
     "description": "Success message after saving"
   },
   "optionsSaveStatusError": {
-    "message": "Unable to save settings.",
+    "message": "No se han podido guardar los ajustes.",
     "description": "Error message when saving fails"
   },
   "optionsErrorSameLang": {
-    "message": "Native and learning languages must be different.",
+    "message": "El idioma nativo y el de aprendizaje deben ser diferentes.",
     "description": "Error when native and learning languages are the same"
   },
   "langEnFull": {
-    "message": "🇬🇧 English",
+    "message": "🇬🇧 Inglés",
     "description": "English with flag"
   },
   "langEsFull": {
-    "message": "🇪🇸 Spanish",
+    "message": "🇪🇸 Español",
     "description": "Spanish with flag"
   },
   "langFrFull": {
-    "message": "🇫🇷 French",
+    "message": "🇫🇷 Francés",
     "description": "French with flag"
   },
   "langDeFull": {
-    "message": "🇩🇪 German",
+    "message": "🇩🇪 Alemán",
     "description": "German with flag"
   },
   "contentBadgeTitle": {
-    "message": "Translate with Mirlo",
+    "message": "Traducir con Mirlo",
     "description": "Tooltip/Aria label for the translation badge"
   },
   "contentSwitchTo": {
-    "message": "Switch to $LANG$",
+    "message": "Cambiar a $LANG$",
     "description": "Button text to switch language",
     "placeholders": {
       "lang": {
@@ -203,7 +203,7 @@
     }
   },
   "contentEnableOnDomain": {
-    "message": "Enable Mirlo on $DOMAIN$?",
+    "message": "¿Activar Mirlo en $DOMAIN$?",
     "description": "Toast title asking to enable on a specific domain",
     "placeholders": {
       "domain": {
@@ -212,11 +212,11 @@
     }
   },
   "contentEnable": {
-    "message": "Enable",
+    "message": "Activar",
     "description": "Button to enable on domain"
   },
   "contentNotNow": {
-    "message": "Not now",
+    "message": "Ahora no",
     "description": "Button to dismiss enable toast"
   }
 }

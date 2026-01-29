@@ -3,6 +3,10 @@
  * This function handles text content and common attributes like placeholder, title, and aria-label.
  */
 function localizeHtmlPage() {
+  // 0. Set HTML lang attribute
+  document.documentElement.lang = chrome.i18n.getUILanguage();
+  console.log('Mirlo i18n: UI Language detected as:', chrome.i18n.getUILanguage());
+
   // 1. Localize text content using data-i18n
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const messageKey = el.getAttribute('data-i18n');

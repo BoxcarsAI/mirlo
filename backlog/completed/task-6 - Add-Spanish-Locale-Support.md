@@ -1,10 +1,10 @@
 ---
 id: TASK-6
 title: Add Spanish Locale Support
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-01-29 15:32'
-updated_date: '2026-01-29 16:55'
+updated_date: '2026-01-29 17:22'
 labels: []
 dependencies:
   - TASK-3
