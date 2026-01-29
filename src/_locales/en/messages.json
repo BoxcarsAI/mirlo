@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Mirlo",
+    "description": "The name of the extension"
+  },
+  "appDesc": {
+    "message": "Privacy-first language learning for intermediate learners. Read real content with instant, local translations. No tracking.",
+    "description": "The description of the extension shown in the store and extensions page"
+  },
+  "actionTitle": {
+    "message": "Mirlo",
+    "description": "The title of the extension action (hover tooltip)"
+  }
+}

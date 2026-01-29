@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Mirlo",
+  "name": "__MSG_appName__",
+  "default_locale": "en",
   "version": "0.1.0",
-  "description": "Privacy-first language learning for intermediate learners. Read real content with instant, local translations. No tracking.",
+  "description": "__MSG_appDesc__",
   "action": {
-    "default_title": "Mirlo",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "assets/mirlo-16.png",
