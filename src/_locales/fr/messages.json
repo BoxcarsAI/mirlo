@@ -1,0 +1,222 @@
+{
+  "appName": {
+    "message": "Mirlo",
+    "description": "The name of the extension"
+  },
+  "appDesc": {
+    "message": "Apprentissage des langues axé sur la confidentialité pour les apprenants intermédiaires. Lisez du contenu réel avec des traductions locales instantanées. Sans suivi.",
+    "description": "The description of the extension shown in the store and extensions page"
+  },
+  "actionTitle": {
+    "message": "Mirlo",
+    "description": "The title of the extension action (hover tooltip)"
+  },
+  "popupLoadingSite": {
+    "message": "Chargement du site…",
+    "description": "Initial text while checking the current site"
+  },
+  "popupStatusEnabled": {
+    "message": "✓ Activé",
+    "description": "Status badge when extension is enabled"
+  },
+  "popupStatusDisabled": {
+    "message": "Désactivé",
+    "description": "Status badge when extension is disabled"
+  },
+  "popupEnableBtn": {
+    "message": "Activer",
+    "description": "Button text to enable the extension"
+  },
+  "popupDisableBtn": {
+    "message": "Désactiver",
+    "description": "Button text to disable the extension"
+  },
+  "popupChangeLanguages": {
+    "message": "Changer de langue →",
+    "description": "Link to options page"
+  },
+  "popupAiStatusFormat": {
+    "message": "État de l'IA : $STATUS$",
+    "description": "Format for AI status line",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupPageLangFormat": {
+    "message": "Langue de la page : $LANG$",
+    "description": "Format for page language line",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "popupSiteUnavailable": {
+    "message": "Site indisponible",
+    "description": "Status when site cannot be accessed"
+  },
+  "popupNoActiveTab": {
+    "message": "Aucun onglet actif",
+    "description": "Status when no tab is active"
+  },
+  "popupUnknown": {
+    "message": "Inconnu",
+    "description": "Unknown language or status"
+  },
+  "popupNotSupported": {
+    "message": "Non pris en charge",
+    "description": "AI features not supported status"
+  },
+  "popupDetectorUnsupported": {
+    "message": "LanguageDetector non pris en charge",
+    "description": "Status detail when detector is missing"
+  },
+  "popupTranslationSupported": {
+    "message": "Traduction prise en charge",
+    "description": "Status detail when translation is available"
+  },
+  "popupTranslationUnsupported": {
+    "message": "Traduction non prise en charge",
+    "description": "Status detail when translation is missing"
+  },
+  "popupAiStatusInit": {
+    "message": "État de l'IA : Vérification…",
+    "description": "Initial text for AI status"
+  },
+  "popupPageLangInit": {
+    "message": "Langue de la page : Vérification…",
+    "description": "Initial text for page language"
+  },
+  "popupDetectorPrefix": {
+    "message": "LanguageDetector",
+    "description": "Prefix for detector status"
+  },
+  "langEn": {
+    "message": "Anglais",
+    "description": "Language name for English"
+  },
+  "langEs": {
+    "message": "Espagnol",
+    "description": "Language name for Spanish"
+  },
+  "langFr": {
+    "message": "Français",
+    "description": "Language name for French"
+  },
+  "langDe": {
+    "message": "Allemand",
+    "description": "Language name for German"
+  },
+  "optionsTitle": {
+    "message": "Options Mirlo",
+    "description": "Page title for options"
+  },
+  "optionsHeroAlt": {
+    "message": "Oiseau Mirlo avec des caractères linguistiques colorés",
+    "description": "Alt text for hero banner"
+  },
+  "optionsSettingsTitle": {
+    "message": "Paramètres Mirlo",
+    "description": "Main title on options page"
+  },
+  "optionsSettingsSubtitle": {
+    "message": "Apprenez les langues naturellement",
+    "description": "Subtitle on options page"
+  },
+  "optionsPreferencesTitle": {
+    "message": "Préférences linguistiques",
+    "description": "Section title for language selection"
+  },
+  "optionsAriaLabel": {
+    "message": "Préférences linguistiques Mirlo",
+    "description": "Aria label for the language preferences form"
+  },
+  "optionsNativeLabel": {
+    "message": "Langue maternelle",
+    "description": "Label for native language select"
+  },
+  "optionsNativeHint": {
+    "message": "La langue que vous connaissez le mieux",
+    "description": "Hint for native language select"
+  },
+  "optionsLearningLabel": {
+    "message": "Langue d'apprentissage",
+    "description": "Label for learning language select"
+  },
+  "optionsLearningHint": {
+    "message": "La langue que vous souhaitez apprendre",
+    "description": "Hint for learning language select"
+  },
+  "optionsSaveBtn": {
+    "message": "Enregistrer les paramètres",
+    "description": "Button to save settings"
+  },
+  "optionsSaveStatusSaving": {
+    "message": "Enregistrement...",
+    "description": "Status message when saving"
+  },
+  "optionsSaveStatusSaved": {
+    "message": "Enregistré !",
+    "description": "Button text after successful save"
+  },
+  "optionsSaveStatusSuccess": {
+    "message": "✓ Paramètres enregistrés avec succès !",
+    "description": "Success message after saving"
+  },
+  "optionsSaveStatusError": {
+    "message": "Impossible d'enregistrer les paramètres.",
+    "description": "Error message when saving fails"
+  },
+  "optionsErrorSameLang": {
+    "message": "La langue maternelle et la langue d'apprentissage doivent être différentes.",
+    "description": "Error when native and learning languages are the same"
+  },
+  "langEnFull": {
+    "message": "🇬🇧 Anglais",
+    "description": "English with flag"
+  },
+  "langEsFull": {
+    "message": "🇪🇸 Espagnol",
+    "description": "Spanish with flag"
+  },
+  "langFrFull": {
+    "message": "🇫🇷 Français",
+    "description": "French with flag"
+  },
+  "langDeFull": {
+    "message": "🇩🇪 Allemand",
+    "description": "German with flag"
+  },
+  "contentBadgeTitle": {
+    "message": "Traduire avec Mirlo",
+    "description": "Tooltip/Aria label for the translation badge"
+  },
+  "contentSwitchTo": {
+    "message": "Passer à $LANG$",
+    "description": "Button text to switch language",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentEnableOnDomain": {
+    "message": "Activer Mirlo sur $DOMAIN$ ?",
+    "description": "Toast title asking to enable on a specific domain",
+    "placeholders": {
+      "domain": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentEnable": {
+    "message": "Activer",
+    "description": "Button to enable on domain"
+  },
+  "contentNotNow": {
+    "message": "Pas maintenant",
+    "description": "Button to dismiss enable toast"
+  }
+}
