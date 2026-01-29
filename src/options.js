@@ -64,13 +64,32 @@ function validateLanguages(native, learning) {
   if (native === learning) {
     return {
       valid: false,
-      message: "Native and learning languages must be different."
+      message: chrome.i18n.getMessage("optionsErrorSameLang")
     };
   }
   return { valid: true };
 }
 
+function populateLanguageSelects() {
+  const languages = [
+    { code: "en", name: chrome.i18n.getMessage("langEnFull") },
+    { code: "es", name: chrome.i18n.getMessage("langEsFull") },
+    { code: "fr", name: chrome.i18n.getMessage("langFrFull") },
+    { code: "de", name: chrome.i18n.getMessage("langDeFull") }
+  ];
+
+  [nativeSelect, learningSelect].forEach((select) => {
+    languages.forEach((lang) => {
+      const option = document.createElement("option");
+      option.value = lang.code;
+      option.textContent = lang.name;
+      select.appendChild(option);
+    });
+  });
+}
+
 async function init() {
+  populateLanguageSelects();
   const settings = await getSettings();
   nativeSelect.value = settings.native;
   learningSelect.value = settings.learning;
@@ -87,20 +106,20 @@ saveButton.addEventListener("click", async () => {
   }
 
   saveButton.disabled = true;
-  saveButton.textContent = "Saving...";
+  saveButton.textContent = chrome.i18n.getMessage("optionsSaveStatusSaving");
 
   const saved = await saveSettings(native, learning);
 
   if (saved) {
-    showStatus("✓ Settings saved successfully!", "success");
-    saveButton.textContent = "Saved!";
+    showStatus(chrome.i18n.getMessage("optionsSaveStatusSuccess"), "success");
+    saveButton.textContent = chrome.i18n.getMessage("optionsSaveStatusSaved");
   } else {
-    showStatus("Unable to save settings.", "error");
-    saveButton.textContent = "Save Settings";
+    showStatus(chrome.i18n.getMessage("optionsSaveStatusError"), "error");
+    saveButton.textContent = chrome.i18n.getMessage("optionsSaveBtn");
   }
 
   window.setTimeout(() => {
-    saveButton.textContent = "Save Settings";
+    saveButton.textContent = chrome.i18n.getMessage("optionsSaveBtn");
     saveButton.disabled = false;
   }, 1200);
 });

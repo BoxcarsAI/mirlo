@@ -108,5 +108,81 @@
   "langDe": {
     "message": "German",
     "description": "Language name for German"
+  },
+  "optionsTitle": {
+    "message": "Mirlo Options",
+    "description": "Page title for options"
+  },
+  "optionsHeroAlt": {
+    "message": "Mirlo bird with colorful language characters",
+    "description": "Alt text for hero banner"
+  },
+  "optionsSettingsTitle": {
+    "message": "Mirlo Settings",
+    "description": "Main title on options page"
+  },
+  "optionsSettingsSubtitle": {
+    "message": "Learn languages naturally",
+    "description": "Subtitle on options page"
+  },
+  "optionsPreferencesTitle": {
+    "message": "Language Preferences",
+    "description": "Section title for language selection"
+  },
+  "optionsNativeLabel": {
+    "message": "Native Language",
+    "description": "Label for native language select"
+  },
+  "optionsNativeHint": {
+    "message": "The language you know best",
+    "description": "Hint for native language select"
+  },
+  "optionsLearningLabel": {
+    "message": "Learning Language",
+    "description": "Label for learning language select"
+  },
+  "optionsLearningHint": {
+    "message": "The language you want to learn",
+    "description": "Hint for learning language select"
+  },
+  "optionsSaveBtn": {
+    "message": "Save Settings",
+    "description": "Button to save settings"
+  },
+  "optionsSaveStatusSaving": {
+    "message": "Saving...",
+    "description": "Status message when saving"
+  },
+  "optionsSaveStatusSaved": {
+    "message": "Saved!",
+    "description": "Button text after successful save"
+  },
+  "optionsSaveStatusSuccess": {
+    "message": "✓ Settings saved successfully!",
+    "description": "Success message after saving"
+  },
+  "optionsSaveStatusError": {
+    "message": "Unable to save settings.",
+    "description": "Error message when saving fails"
+  },
+  "optionsErrorSameLang": {
+    "message": "Native and learning languages must be different.",
+    "description": "Error when native and learning languages are the same"
+  },
+  "langEnFull": {
+    "message": "🇬🇧 English",
+    "description": "English with flag"
+  },
+  "langEsFull": {
+    "message": "🇪🇸 Spanish",
+    "description": "Spanish with flag"
+  },
+  "langFrFull": {
+    "message": "🇫🇷 French",
+    "description": "French with flag"
+  },
+  "langDeFull": {
+    "message": "🇩🇪 German",
+    "description": "German with flag"
   }
 }

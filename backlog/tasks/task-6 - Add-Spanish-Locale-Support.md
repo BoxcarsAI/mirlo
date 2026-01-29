@@ -4,13 +4,14 @@ title: Add Spanish Locale Support
 status: To Do
 assignee: []
 created_date: '2026-01-29 15:32'
-updated_date: '2026-01-29 15:40'
+updated_date: '2026-01-29 16:55'
 labels: []
 dependencies:
   - TASK-3
   - TASK-4
   - TASK-5
 priority: medium
+ordinal: 2000
 ---
 
 ## Description

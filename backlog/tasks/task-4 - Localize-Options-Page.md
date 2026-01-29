@@ -1,14 +1,15 @@
 ---
 id: TASK-4
 title: Localize Options Page
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-01-29 15:32'
-updated_date: '2026-01-29 15:40'
+updated_date: '2026-01-29 17:03'
 labels: []
 dependencies:
   - TASK-2
 priority: medium
+ordinal: 3000
 ---
 
 ## Description
@@ -19,11 +20,11 @@ Extract strings from the Options page. Crucially, ensure the "Language" dropdown
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 No hardcoded user-facing strings remain in options.html
-- [ ] #2 options.js uses chrome.i18n.getMessage for dynamic text and status messages
-- [ ] #3 The list of available languages (English, Spanish, French, German) is localized
-- [ ] #4 All extracted strings are added to _locales/en/messages.json
-- [ ] #5 The Options page renders correctly in English
+- [x] #1 No hardcoded user-facing strings remain in options.html
+- [x] #2 options.js uses chrome.i18n.getMessage for dynamic text and status messages
+- [x] #3 The list of available languages (English, Spanish, French, German) is localized
+- [x] #4 All extracted strings are added to _locales/en/messages.json
+- [x] #5 The Options page renders correctly in English
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -50,3 +51,9 @@ Extract strings from the Options page. Crucially, ensure the "Language" dropdown
     *   Verify all text is present and correct in English.
     *   Verify dropdowns are populated and work for saving settings.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Localized the Options page by extracting all user-facing strings into `src/_locales/en/messages.json`. Updated `src/options.html` with `data-i18n` attributes and included the `utils/i18n.js` utility. Refactored `src/options.js` to dynamically populate the language selection dropdowns with localized names and updated all status/validation messages to use `chrome.i18n.getMessage`. Verified consistency and security via `codebase_investigator` review.
+<!-- SECTION:FINAL_SUMMARY:END -->
