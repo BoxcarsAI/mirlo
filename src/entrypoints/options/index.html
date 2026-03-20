@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="manifest.open_in_tab" content="true" />
     <title data-i18n="optionsTitle">Mirlo Options</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,14 +11,14 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="options.css" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <header class="options-header">
       <div class="options-header-inner">
         <img
           class="options-hero-banner"
-          src="assets/mirlo-hero-banner.png"
+          src="/assets/mirlo-hero-banner.png"
           data-i18n-alt="optionsHeroAlt"
         />
         <div class="options-header-text">
@@ -55,7 +56,6 @@
       </form>
     </main>
 
-    <script src="utils/i18n.js"></script>
-    <script src="options.js"></script>
+    <script type="module" src="./main.ts"></script>
   </body>
 </html>

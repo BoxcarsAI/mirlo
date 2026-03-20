@@ -1,34 +1,33 @@
-const statusEl = document.getElementById("ai-status");
-const languageEl = document.getElementById("page-language");
-const domainEl = document.getElementById("site-domain");
-const siteStatusEl = document.getElementById("site-status");
-const toggleButton = document.getElementById("toggle-site");
-const nativeLangEl = document.getElementById("native-lang");
-const learningLangEl = document.getElementById("learning-lang");
-const optionsLink = document.getElementById("open-options");
+import { localizeHtmlPage } from "@/utils/i18n";
+import { normalizeDomain, normalizeDomainList, getDomainFromUrl } from "@/utils/domains";
+import { STORAGE_KEYS } from "@/utils/storage-keys";
+import { getLanguageName } from "@/utils/language";
 
-const STORAGE_KEYS = {
-  enabledDomains: "mirlo:enabled_domains",
-  dismissedDomains: "mirlo:dismissed_domains",
-  nativeLanguage: "mirlo:native_language",
-  learningLanguage: "mirlo:learning_language"
-};
+localizeHtmlPage();
+
+const statusEl = document.getElementById("ai-status")!;
+const languageEl = document.getElementById("page-language")!;
+const domainEl = document.getElementById("site-domain")!;
+const siteStatusEl = document.getElementById("site-status")!;
+const toggleButton = document.getElementById("toggle-site") as HTMLButtonElement;
+const nativeLangEl = document.getElementById("native-lang")!;
+const learningLangEl = document.getElementById("learning-lang")!;
+const optionsLink = document.getElementById("open-options");
 
 let currentDomain = "";
 let currentEnabled = false;
-let currentTabId = null;
+let currentTabId: number | null = null;
 
-function getLanguageName(code) {
-  const names = {
-    en: chrome.i18n.getMessage("langEn"),
-    es: chrome.i18n.getMessage("langEs"),
-    fr: chrome.i18n.getMessage("langFr"),
-    de: chrome.i18n.getMessage("langDe")
-  };
-  return names[code] || (code ? code.toUpperCase() : "");
+interface LanguageInfo {
+  htmlLang?: string;
+  translationSupported?: boolean;
+  detectorSupported?: boolean;
+  detectorAvailability?: string;
+  detectorResult?: { detectedLanguage: string; confidence: number } | null;
+  detectorError?: string | null;
 }
 
-function loadLanguagePreferences() {
+function loadLanguagePreferences(): Promise<{ native: string; learning: string }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
       resolve({ native: "en", learning: "es" });
@@ -39,14 +38,14 @@ function loadLanguagePreferences() {
       (result) => {
         resolve({
           native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
-          learning: result?.[STORAGE_KEYS.learningLanguage] || "es"
+          learning: result?.[STORAGE_KEYS.learningLanguage] || "es",
         });
-      }
+      },
     );
   });
 }
 
-function formatLanguage(info) {
+function formatLanguage(info: LanguageInfo | null): string {
   if (!info) return chrome.i18n.getMessage("popupUnknown");
   if (info.detectorResult?.detectedLanguage) {
     const confidence = Math.round(info.detectorResult.confidence * 100);
@@ -57,7 +56,7 @@ function formatLanguage(info) {
   return chrome.i18n.getMessage("popupUnknown");
 }
 
-function formatAiStatus(info) {
+function formatAiStatus(info: LanguageInfo | null): string {
   if (!info) return chrome.i18n.getMessage("popupNotSupported");
   const detectorPrefix = chrome.i18n.getMessage("popupDetectorPrefix");
   const detector = info.detectorSupported
@@ -69,35 +68,12 @@ function formatAiStatus(info) {
   return `${detector}; ${translation}`;
 }
 
-function updateUi(info) {
+function updateUi(info: LanguageInfo | null): void {
   statusEl.textContent = chrome.i18n.getMessage("popupAiStatusFormat", [formatAiStatus(info)]);
   languageEl.textContent = chrome.i18n.getMessage("popupPageLangFormat", [formatLanguage(info)]);
 }
 
-function normalizeDomain(hostname) {
-  if (!hostname) return "";
-  return hostname.replace(/^www\./i, "").toLowerCase();
-}
-
-function getDomainFromUrl(url) {
-  if (!url) return "";
-  try {
-    const parsed = new URL(url);
-    if (!parsed.hostname || !parsed.protocol.startsWith("http")) return "";
-    return normalizeDomain(parsed.hostname);
-  } catch (error) {
-    return "";
-  }
-}
-
-function normalizeDomainList(list) {
-  if (!Array.isArray(list)) return [];
-  return list
-    .map((domain) => (typeof domain === "string" ? normalizeDomain(domain) : ""))
-    .filter(Boolean);
-}
-
-function getStoredDomains() {
+function getStoredDomains(): Promise<{ enabled: string[]; dismissed: string[] }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
       resolve({ enabled: [], dismissed: [] });
@@ -112,14 +88,14 @@ function getStoredDomains() {
         }
         resolve({
           enabled: normalizeDomainList(result?.[STORAGE_KEYS.enabledDomains]),
-          dismissed: normalizeDomainList(result?.[STORAGE_KEYS.dismissedDomains])
+          dismissed: normalizeDomainList(result?.[STORAGE_KEYS.dismissedDomains]),
         });
-      }
+      },
     );
   });
 }
 
-function setStoredDomains(key, domains) {
+function setStoredDomains(key: string, domains: string[]): Promise<void> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
       resolve();
@@ -129,7 +105,7 @@ function setStoredDomains(key, domains) {
   });
 }
 
-async function setDomainEnabled(domain, enabled) {
+async function setDomainEnabled(domain: string, enabled: boolean): Promise<void> {
   const stored = await getStoredDomains();
   let nextEnabled = stored.enabled.filter((item) => item !== domain);
   if (enabled) {
@@ -142,7 +118,15 @@ async function setDomainEnabled(domain, enabled) {
   }
 }
 
-function setSiteUi({ domain, enabled, toggleDisabled }) {
+function setSiteUi({
+  domain,
+  enabled,
+  toggleDisabled,
+}: {
+  domain: string;
+  enabled: boolean;
+  toggleDisabled: boolean;
+}): void {
   domainEl.textContent = domain ? domain : chrome.i18n.getMessage("popupSiteUnavailable");
   currentEnabled = Boolean(enabled);
   siteStatusEl.textContent = currentEnabled
@@ -156,7 +140,7 @@ function setSiteUi({ domain, enabled, toggleDisabled }) {
   toggleButton.disabled = Boolean(toggleDisabled);
 }
 
-async function initializePopup(tab) {
+async function initializePopup(tab: chrome.tabs.Tab): Promise<void> {
   currentTabId = tab?.id ?? null;
   currentDomain = getDomainFromUrl(tab?.url);
 
@@ -165,7 +149,11 @@ async function initializePopup(tab) {
   if (learningLangEl) learningLangEl.textContent = getLanguageName(languages.learning);
 
   if (!currentDomain) {
-    setSiteUi({ domain: chrome.i18n.getMessage("popupSiteUnavailable"), enabled: false, toggleDisabled: true });
+    setSiteUi({
+      domain: chrome.i18n.getMessage("popupSiteUnavailable"),
+      enabled: false,
+      toggleDisabled: true,
+    });
     updateUi(null);
     return;
   }
@@ -174,20 +162,18 @@ async function initializePopup(tab) {
   setSiteUi({
     domain: currentDomain,
     enabled: stored.enabled.includes(currentDomain),
-    toggleDisabled: false
+    toggleDisabled: false,
   });
 
-  chrome.tabs.sendMessage(
-    currentTabId,
-    { type: "mirlo:getLanguageInfo" },
-    (response) => {
+  if (currentTabId) {
+    chrome.tabs.sendMessage(currentTabId, { type: "mirlo:getLanguageInfo" }, (response) => {
       if (chrome.runtime.lastError) {
         updateUi(null);
         return;
       }
       updateUi(response);
-    }
-  );
+    });
+  }
 }
 
 toggleButton.addEventListener("click", async () => {
@@ -201,7 +187,7 @@ toggleButton.addEventListener("click", async () => {
     { type: "mirlo:setActive", enabled: nextEnabled },
     () => {
       toggleButton.disabled = false;
-    }
+    },
   );
 });
 
@@ -213,7 +199,11 @@ optionsLink?.addEventListener("click", (event) => {
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const tab = tabs && tabs[0];
   if (!tab?.id) {
-    setSiteUi({ domain: chrome.i18n.getMessage("popupNoActiveTab"), enabled: false, toggleDisabled: true });
+    setSiteUi({
+      domain: chrome.i18n.getMessage("popupNoActiveTab"),
+      enabled: false,
+      toggleDisabled: true,
+    });
     updateUi(null);
     return;
   }

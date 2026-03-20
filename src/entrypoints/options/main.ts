@@ -1,17 +1,17 @@
-const STORAGE_KEYS = {
-  nativeLanguage: "mirlo:native_language",
-  learningLanguage: "mirlo:learning_language"
-};
+import { localizeHtmlPage } from "@/utils/i18n";
+import { STORAGE_KEYS } from "@/utils/storage-keys";
+
+localizeHtmlPage();
 
 const DEFAULT_NATIVE = "en";
 const DEFAULT_LEARNING = "es";
 
-const nativeSelect = document.getElementById("native-language");
-const learningSelect = document.getElementById("learning-language");
-const saveButton = document.getElementById("save-button");
-const statusEl = document.getElementById("save-status");
+const nativeSelect = document.getElementById("native-language") as HTMLSelectElement;
+const learningSelect = document.getElementById("learning-language") as HTMLSelectElement;
+const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+const statusEl = document.getElementById("save-status")!;
 
-function getSettings() {
+function getSettings(): Promise<{ native: string; learning: string }> {
   return new Promise((resolve) => {
     chrome.storage.sync.get(
       [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
@@ -24,19 +24,19 @@ function getSettings() {
 
         resolve({
           native: result[STORAGE_KEYS.nativeLanguage] || DEFAULT_NATIVE,
-          learning: result[STORAGE_KEYS.learningLanguage] || DEFAULT_LEARNING
+          learning: result[STORAGE_KEYS.learningLanguage] || DEFAULT_LEARNING,
         });
-      }
+      },
     );
   });
 }
 
-function saveSettings(native, learning) {
+function saveSettings(native: string, learning: string): Promise<boolean> {
   return new Promise((resolve) => {
     chrome.storage.sync.set(
       {
         [STORAGE_KEYS.nativeLanguage]: native,
-        [STORAGE_KEYS.learningLanguage]: learning
+        [STORAGE_KEYS.learningLanguage]: learning,
       },
       () => {
         if (chrome.runtime.lastError) {
@@ -45,37 +45,40 @@ function saveSettings(native, learning) {
           return;
         }
         resolve(true);
-      }
+      },
     );
   });
 }
 
-function showStatus(message, type) {
+function showStatus(message: string, type: string): void {
   statusEl.textContent = message;
   statusEl.className = "options-status";
   statusEl.classList.add(`is-${type}`, "is-visible");
 
-  window.setTimeout(() => {
+  setTimeout(() => {
     statusEl.classList.remove("is-visible");
   }, 2500);
 }
 
-function validateLanguages(native, learning) {
+function validateLanguages(
+  native: string,
+  learning: string,
+): { valid: boolean; message?: string } {
   if (native === learning) {
     return {
       valid: false,
-      message: chrome.i18n.getMessage("optionsErrorSameLang")
+      message: chrome.i18n.getMessage("optionsErrorSameLang"),
     };
   }
   return { valid: true };
 }
 
-function populateLanguageSelects() {
+function populateLanguageSelects(): void {
   const languages = [
     { code: "en", name: chrome.i18n.getMessage("langEnFull") },
     { code: "es", name: chrome.i18n.getMessage("langEsFull") },
     { code: "fr", name: chrome.i18n.getMessage("langFrFull") },
-    { code: "de", name: chrome.i18n.getMessage("langDeFull") }
+    { code: "de", name: chrome.i18n.getMessage("langDeFull") },
   ];
 
   [nativeSelect, learningSelect].forEach((select) => {
@@ -88,7 +91,7 @@ function populateLanguageSelects() {
   });
 }
 
-async function init() {
+async function init(): Promise<void> {
   populateLanguageSelects();
   const settings = await getSettings();
   nativeSelect.value = settings.native;
@@ -101,7 +104,7 @@ saveButton.addEventListener("click", async () => {
 
   const validation = validateLanguages(native, learning);
   if (!validation.valid) {
-    showStatus(validation.message, "error");
+    showStatus(validation.message!, "error");
     return;
   }
 
@@ -118,7 +121,7 @@ saveButton.addEventListener("click", async () => {
     saveButton.textContent = chrome.i18n.getMessage("optionsSaveBtn");
   }
 
-  window.setTimeout(() => {
+  setTimeout(() => {
     saveButton.textContent = chrome.i18n.getMessage("optionsSaveBtn");
     saveButton.disabled = false;
   }, 1200);
