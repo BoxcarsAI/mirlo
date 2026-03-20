@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:chrome.google.com)",
+      "WebSearch",
+      "Bash(backlog overview:*)",
+      "Bash(backlog task:*)",
+      "Bash(backlog milestone:*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": false,
+    "autoAllowBashIfSandboxed": false
+  }
+}

@@ -2,17 +2,27 @@
 
 ## What We're Building
 
-A free, privacy-focused Chrome translation extension powered by local AI. Helps intermediate language learners (B1-B2) read authentic content in their target language with paragraph-level translations — no tracking, no upsells, no external APIs.
+The open-source, privacy-first alternative to Toucan — learn languages while you browse, powered entirely by local AI. No tracking, no upsells, no external APIs.
+
+Mirlo is a free Chrome extension that helps language learners read real web content with contextual translations, all processed on-device using Chrome's built-in Translator API.
 
 ## Why This Project Exists
 
-**Product goal**: A useful tool that people actually install and use for language learning.
+**Product goal**: A useful tool that people actually install and use for language learning. Toucan (now owned by Babbel) defined this category but is becoming an upsell vehicle with reliability issues and only 12 languages. Mirlo is the open, private, community-driven alternative.
 
 **Builder goals** (equally important):
 - Learn Chrome local AI APIs (Gemini Nano, Translation API)
 - Learn the full extension lifecycle: build → package → publish → promote → measure
 - Develop repeatable procedures for shipping — this is the first product through the creative factory
 - The process we build here becomes the template for every future project
+
+## Where We're Going (6-Month Vision)
+
+1. **Toucan parity**: Word-level contextual translation while browsing (not just paragraphs)
+2. **Learning features**: Vocabulary saving, spaced repetition, progress tracking
+3. **Broad language support**: Expand beyond the initial 4 to cover all Chrome Translator API languages
+4. **Community**: Open-source contributors, user feedback loop, presence in language learning communities
+5. **Growth target**: 500+ weekly active users
 
 ## What Success Looks Like
 
@@ -31,12 +41,13 @@ A free, privacy-focused Chrome translation extension powered by local AI. Helps 
 ## Current State
 
 - Extension works with 4 languages (En, Es, Fr, De)
-- Unlisted in Chrome Web Store
-- 10/11 i18n tasks complete. One remaining: localized screenshots.
-- Ready to go public once screenshots are done.
+- Submitted for public listing on Chrome Web Store (2026-03-20, pending review): https://chromewebstore.google.com/detail/bolaihmnmcaedodmcempenkddbkolaih/
+- i18n GA milestone complete (10/11 tasks done; screenshots deferred)
+- **Next milestone**: First real users → Toucan parity
 
-## Vault Link
+## Reference
 
-This project is tracked in the vault at:
-- Area: [[Area-Mirlo Chrome Extension]]
-- Project: [[PR-2026-Publish Mirlo in Chrome Web Store]]
+- Privacy policy: https://www.boxcars.ai/mirlo-privacy-policy/
+- Mirlo bird SVG: Creative Commons CC0 from https://svgsilh.com/tag/blackbird-1.html
+- Vault area: [[Area-Mirlo Chrome Extension]]
+- Vault project: [[PR-2026-Publish Mirlo in Chrome Web Store]]

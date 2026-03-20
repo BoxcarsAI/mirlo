@@ -5,8 +5,8 @@ status: To Do
 assignee: []
 created_date: '2026-01-29 19:56'
 updated_date: '2026-01-29 20:14'
-labels: []
-milestone: GA - i18n Launch (Core 4)
+labels: [marketing]
+milestone: Go Public
 dependencies: []
 priority: medium
 ---
