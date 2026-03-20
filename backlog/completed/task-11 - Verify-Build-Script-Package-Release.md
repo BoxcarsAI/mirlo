@@ -1,10 +1,10 @@
 ---
 id: TASK-11
 title: Verify Build Script & Package Release
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-01-29 20:11'
-updated_date: '2026-01-29 20:14'
+updated_date: '2026-01-29 20:30'
 labels: []
 milestone: GA - i18n Launch (Core 4)
 dependencies: []
@@ -43,3 +43,15 @@ Steps:
     *   Confirm no errors on load.
     *   This confirms the artifact is ready for the Web Store.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Successfully verified the build script and generated the release artifact.
+
+Verification results:
+- `scripts/zip-src.sh` correctly packages the `src/` directory.
+- The output `src.zip` includes all 4 localized folders in `_locales/` (en, es, fr, de).
+- No sensitive files (.git) were included in the package.
+- The package is ready for upload to the Chrome Web Store.
+<!-- SECTION:FINAL_SUMMARY:END -->

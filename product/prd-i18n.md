@@ -2,7 +2,7 @@
 
 ## 1. Overview
 **Title:** Extension Internationalization (i18n)
-**Status:** Draft
+**Status:** Completed (superseded by prd-i18n-ga.md)
 **Owner:** Product Manager (AI)
 
 ### Executive Summary
