@@ -1,41 +1,11 @@
 import "./style.css";
 import { normalizeDomain, normalizeDomainList } from "@/utils/domains";
 import { STORAGE_KEYS } from "@/utils/storage-keys";
-import { getLanguageName, getWordCount } from "@/utils/language";
+import { getLanguageName } from "@/utils/language";
+import { isArticleLike } from "@/utils/article-detection";
+import { SKIP_SELECTORS, getParagraphText, isEligibleParagraph } from "@/utils/paragraph-filter";
+import { getHtmlLanguage, getNormalizedPageLanguage, getLanguagePairForPage } from "@/utils/translation";
 
-const SKIP_SELECTORS =
-  "script,style,textarea,code,pre,svg,math,head,title,input,option,select,button";
-const SKIP_CONTAINERS = [
-  "nav",
-  "header",
-  "footer",
-  "aside",
-  "form",
-  '[role="navigation"]',
-  '[role="banner"]',
-  '[role="contentinfo"]',
-  '[role="complementary"]',
-  '[role="search"]',
-  '[role="form"]',
-  ".sidebar",
-  ".menu",
-  ".nav",
-  ".footer",
-  ".header",
-  ".comment",
-  ".comments",
-  ".ad",
-  ".advertisement",
-  ".promo",
-  ".related",
-  ".recommended",
-  "#sidebar",
-  "#menu",
-  "#nav",
-  "#footer",
-  "#header",
-  "#comments",
-].join(",");
 const TOAST_AUTO_DISMISS_MS = 8000;
 
 let tooltipEl: HTMLDivElement | null = null;
@@ -68,20 +38,6 @@ interface LanguageInfo {
 interface StoredDomains {
   enabled: string[];
   dismissed: string[];
-}
-
-interface LanguagePair {
-  sourceLanguage: string;
-  targetLanguage: string;
-}
-
-function getHtmlLanguage(): string {
-  const docLang = document.documentElement?.lang?.trim();
-  if (docLang) return docLang;
-  const metaLang =
-    document.querySelector<HTMLMetaElement>('meta[http-equiv="content-language"]')?.content ||
-    document.querySelector<HTMLMetaElement>('meta[name="language"]')?.content;
-  return metaLang ? metaLang.trim() : "";
 }
 
 function shouldSkipNode(node: Node): boolean {
@@ -164,24 +120,6 @@ async function getPageLanguageInfo(): Promise<LanguageInfo> {
   };
 }
 
-function getNormalizedPageLanguage(): string {
-  const htmlLang = getHtmlLanguage();
-  if (!htmlLang) return "";
-  return htmlLang.split("-")[0].toLowerCase();
-}
-
-function getLanguagePairForPage(): LanguagePair | null {
-  const pageLanguage = getNormalizedPageLanguage();
-  if (!pageLanguage) return null;
-  if (pageLanguage === userNativeLanguage) {
-    return { sourceLanguage: userNativeLanguage, targetLanguage: userLearningLanguage };
-  }
-  if (pageLanguage === userLearningLanguage) {
-    return { sourceLanguage: userLearningLanguage, targetLanguage: userNativeLanguage };
-  }
-  return null;
-}
-
 async function getLanguagePreferences(): Promise<{ native: string; learning: string }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
@@ -258,105 +196,6 @@ async function removeDomainFromList(key: string, domain: string): Promise<string
   return next;
 }
 
-function hasOgArticleMeta(): boolean {
-  const meta = document.querySelector('meta[property="og:type"]');
-  if (!meta) return false;
-  const content = meta.getAttribute("content") || "";
-  return content.trim().toLowerCase() === "article";
-}
-
-function hasArticleSchema(): boolean {
-  const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
-  for (const script of scripts) {
-    const jsonText = script.textContent?.trim();
-    if (!jsonText) continue;
-    try {
-      const parsed = JSON.parse(jsonText);
-      const nodes = Array.isArray(parsed) ? parsed : [parsed];
-      for (const node of nodes) {
-        const typeValue = node?.["@type"];
-        const types = Array.isArray(typeValue) ? typeValue : [typeValue];
-        if (types.some((type: string) => ["Article", "NewsArticle", "BlogPosting"].includes(type))) {
-          return true;
-        }
-      }
-    } catch {
-      continue;
-    }
-  }
-  return false;
-}
-
-function urlLooksLikeArticle(): boolean {
-  const path = `${location.pathname || ""}`.toLowerCase();
-  return ["/article/", "/post/", "/blog/", "/news/", "/story/"].some((segment) =>
-    path.includes(segment),
-  );
-}
-
-function isVisibleElement(element: Element): boolean {
-  if (!element) return false;
-  if (element.closest(SKIP_CONTAINERS)) return false;
-  const rect = element.getBoundingClientRect();
-  if (!rect || rect.width < 20 || rect.height < 16) return false;
-  return true;
-}
-
-function hasParagraphHeuristic(): boolean {
-  const paragraphs = Array.from(document.querySelectorAll("p"));
-  let qualifying = 0;
-  for (const paragraph of paragraphs) {
-    if (!isVisibleElement(paragraph)) continue;
-    const text = paragraph.innerText?.trim();
-    if (!text) continue;
-    if (getWordCount(text) < 15) continue;
-    qualifying += 1;
-    if (qualifying >= 3) return true;
-  }
-  return false;
-}
-
-function isArticleLike(): boolean {
-  if (hasOgArticleMeta()) return true;
-  if (hasArticleSchema()) return true;
-  if (urlLooksLikeArticle()) return true;
-  return hasParagraphHeuristic();
-}
-
-function getParagraphText(paragraph: Element): string {
-  if (!paragraph) return "";
-  const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT, {
-    acceptNode(node: Node) {
-      const parent = node.parentElement;
-      if (!parent) return NodeFilter.FILTER_REJECT;
-      if (parent.closest(".mirlo-badge")) return NodeFilter.FILTER_REJECT;
-      return NodeFilter.FILTER_ACCEPT;
-    },
-  });
-
-  let text = "";
-  let current = walker.nextNode();
-  while (current) {
-    const value = current.nodeValue?.trim();
-    if (value) {
-      text = `${text} ${value}`.trim();
-    }
-    current = walker.nextNode();
-  }
-
-  return text;
-}
-
-function isEligibleParagraph(paragraph: HTMLParagraphElement): boolean {
-  if (!paragraph) return false;
-  if (!isVisibleElement(paragraph)) return false;
-  const text = paragraph.innerText?.trim();
-  if (!text) return false;
-  if (getWordCount(text) <= 15) return false;
-  if (paragraph.classList.contains("mirlo-translated")) return false;
-  return true;
-}
-
 function cancelInFlightTranslation(): void {
   translationRequestId += 1;
   translatingParagraph = null;
@@ -424,7 +263,7 @@ async function translateParagraph(paragraph: HTMLParagraphElement): Promise<void
     return;
   }
 
-  const languagePair = getLanguagePairForPage();
+  const languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
   if (!languagePair) return;
   const { sourceLanguage, targetLanguage } = languagePair;
 
