@@ -4,11 +4,12 @@ title: List Mirlo on AlternativeTo
 status: To Do
 assignee: []
 created_date: '2026-03-20 14:26'
+updated_date: '2026-03-21 09:02'
 labels:
   - marketing
-dependencies: []
-priority: high
 milestone: Go Public
+dependencies: []
+priority: medium
 ---
 
 ## Description

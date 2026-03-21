@@ -13,6 +13,10 @@ Think before you build, but don't overthink it.
 4. **Verify** — Test what you built. Review your own changes for consistency, security, and correctness.
 5. **Ship** — Commit with a clear message: `feat:`, `fix:`, or `chore:` prefix + `[TASK-ID]` when applicable. Stage specific files, not `git add -A`.
 
+## Sandbox
+
+Git commands (`git add`, `git commit`, etc.) must run with `dangerouslyDisableSandbox: true` because the sandbox blocks writes to `.git/` internals (index, objects). Same applies to `npm install` and other commands that write to `node_modules/`.
+
 ## Principles
 
 - **Ship first.** A shipped imperfect thing beats an unshipped perfect thing.
@@ -24,17 +28,28 @@ Think before you build, but don't overthink it.
 ## Project Structure
 
 ```
-src/              — Extension source code
+src/
+  entrypoints/    — WXT entrypoints (content/, popup/, options/)
+  utils/          — Shared modules (domains, language, i18n, storage-keys)
+  __tests__/      — Vitest unit tests
+public/           — Static assets (_locales, icons, SVG)
 backlog/          — Tasks, milestones, completed work (managed by Backlog.md)
 product/          — PRDs and product specs
 marketing/        — Store copy, screenshots, promotional assets
 docs/             — Developer guides, brand, code patterns
 reports/          — Weekly status reports
-scripts/          — Build and utility scripts
 ```
+
+## Dev Commands
+
+- `npm run dev` — WXT dev server with HMR
+- `npm run build` — Production build to `.output/chrome-mv3/`
+- `npm test` — Run Vitest tests
+- `npm run zip` — Create distributable zip
 
 ## Key Files
 
+- `wxt.config.ts` — WXT/manifest configuration
 - `mission.md` — What we're building and why
 - `pm.md` — PM responsibilities and session workflow
 - `product/prd-i18n-ga.md` — Current PRD (i18n GA launch)

@@ -4,11 +4,12 @@ title: Update Store Listing with Toucan Alternative Positioning
 status: To Do
 assignee: []
 created_date: '2026-03-20 14:17'
+updated_date: '2026-03-21 09:02'
 labels:
   - marketing
-dependencies: []
-priority: high
 milestone: Go Public
+dependencies: []
+priority: medium
 ---
 
 ## Description

@@ -4,12 +4,14 @@ title: Integration Testing and Cross-Site QA
 status: To Do
 assignee: []
 created_date: '2026-03-20 14:39'
+updated_date: '2026-03-21 09:02'
 labels:
   - dev
+milestone: Toucan Parity
 dependencies:
+  - TASK-12
   - TASK-23
 priority: medium
-milestone: Toucan Parity
 ---
 
 ## Description

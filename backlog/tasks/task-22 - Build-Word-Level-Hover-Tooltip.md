@@ -1,11 +1,11 @@
 ---
 id: TASK-22
 title: Build Word-Level Hover Tooltip
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-03-20 14:39'
-updated_date: '2026-03-21 08:35'
+updated_date: '2026-03-21 08:49'
 labels:
   - dev
 milestone: Toucan Parity
@@ -22,10 +22,10 @@ When user hovers a replaced word, show a tooltip with: the original word and the
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Hovering a replaced word shows tooltip with original word
-- [ ] #2 Tooltip styled independently from page CSS (shadow DOM)
-- [ ] #3 Tooltip dismisses on mouse-out
-- [ ] #4 Tooltip works across different site layouts without breaking page
+- [x] #1 Hovering a replaced word shows tooltip with original word
+- [x] #2 Tooltip styled independently from page CSS (shadow DOM)
+- [x] #3 Tooltip dismisses on mouse-out
+- [x] #4 Tooltip works across different site layouts without breaking page
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -63,3 +63,17 @@ When user hovers a replaced word, show a tooltip with: the original word and the
    - Content updates (original + translated shown)
    - Show/hide lifecycle
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added word-level hover tooltip using shadow DOM for style isolation.
+
+Changes:
+- `src/utils/word-tooltip.ts` — single shared shadow DOM host element, repositioned per word. Shows original → translation in a compact pill. 120ms delayed hide with pin-on-hover.
+- `src/utils/word-replacement.ts` — replaced `title` attribute with `data-mirlo-translation` dataset; extracted `collectTranslatableWords` and `buildTranslationMap` for testability.
+- `src/entrypoints/content/index.ts` — event delegation on document for mouseover/mouseout on `.mirlo-word-translated`; tooltip cleanup on deactivate.
+- `src/__tests__/word-tooltip.test.ts` — 18 tests covering creation, show/hide lifecycle, scheduled hide with timer, edge cases.
+
+Tests: 146 total, all passing.
+<!-- SECTION:FINAL_SUMMARY:END -->

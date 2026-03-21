@@ -4,12 +4,12 @@ title: Draft Launch Posts for Reddit
 status: To Do
 assignee: []
 created_date: '2026-03-20 14:17'
-updated_date: '2026-03-20 14:26'
+updated_date: '2026-03-21 09:02'
 labels:
   - marketing
 milestone: Go Public
 dependencies: []
-priority: high
+priority: medium
 ---
 
 ## Description

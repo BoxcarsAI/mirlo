@@ -6,7 +6,11 @@
       "WebSearch",
       "Bash(backlog overview:*)",
       "Bash(backlog task:*)",
-      "Bash(backlog milestone:*)"
+      "Bash(backlog milestone:*)",
+      "WebFetch(domain:wxt.dev)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npx vitest:*)",
+      "Bash(npm run:*)"
     ]
   },
   "sandbox": {
