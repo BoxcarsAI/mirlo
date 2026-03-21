@@ -1,55 +1,91 @@
 # Mirlo Development Guide
 
-Welcome to the Mirlo project! This guide provides a technical overview of how the extension is structured and how to contribute.
+Welcome to Mirlo. This guide covers the technical setup and how to contribute.
 
-## Project Vision
+## What Mirlo Does
 
-Mirlo bridges the gap between beginner apps and native-level fluency. We help intermediate learners read authentic content while prioritizing their privacy through local AI translations.
+Mirlo replaces words on web pages with translations in your target language. It uses Chrome's built-in Translator API — everything runs locally, no external APIs. Users control which sites are active and how many words get translated (density control).
 
-## Architecture Overview
+Two translation modes:
+- **Word mode** (automatic): individual words are replaced inline with hover tooltips showing the original
+- **Paragraph mode** (on click): full paragraph translation via the Mirlo badge
 
-- **`src/manifest.json`**: The extension's entry point and configuration.
-- **`src/content.js`**: Injects the translation UI into web pages. It detects paragraphs and handles the click-to-translate logic.
-- **`src/popup.js` / `popup.html`**: The small UI that appears when you click the extension icon in the toolbar. Shows status and quick links.
-- **`src/options.js` / `options.html`**: The settings page where users select their language pairs.
-- **`src/utils/i18n.js`**: A utility script to handle runtime HTML localization.
-- **`src/_locales/`**: Standard Chrome i18n directory containing translations for the UI.
+## Tech Stack
 
-## Supported Languages
+- **WXT** — framework for building Chrome extensions with HMR and TypeScript
+- **TypeScript** — all source code
+- **Vitest** — unit tests with happy-dom for DOM testing
+- **Chrome Translator API** — on-device translation (no cloud calls)
+- **Chrome LanguageDetector API** — per-paragraph language detection
 
-We currently support 4 core languages:
-- 🇬🇧 English (`en`)
-- 🇪🇸 Spanish (`es`)
-- 🇫🇷 French (`fr`)
-- 🇩🇪 German (`de`)
+## Project Structure
 
-These were chosen because they work reliably with Chrome's built-in `window.ai` and Translation APIs.
+```
+src/
+  entrypoints/         — WXT entrypoints
+    content/           — Content script (word replacement, paragraph translation, tooltips)
+    popup/             — Toolbar popup (status, quick actions)
+    options/           — Settings page (languages, density control)
+  utils/               — Shared modules
+    word-replacement.ts    — Word selection, stopword filtering, translation map
+    word-segmentation.ts   — Splitting paragraphs into individual word spans
+    word-tooltip.ts        — Shadow DOM hover tooltip for translated words
+    translation.ts         — Language pair resolution, per-paragraph detection
+    article-detection.ts   — Heuristic for article-like pages
+    paragraph-filter.ts    — Paragraph eligibility checks
+    domains.ts             — Domain normalization
+    language.ts            — Language name lookup
+    storage-keys.ts        — Chrome storage key constants
+  __tests__/           — Vitest unit tests
+    fixtures/          — Test HTML fixtures
+public/
+  _locales/            — Chrome i18n messages (en, es, fr, de)
+  icons/               — Extension icons
+wxt.config.ts          — WXT and manifest configuration
+```
 
 ## Development Workflow
 
-### 1. Local Setup
 ```bash
-# Clone the repo
-git clone https://github.com/boxcarsai/mirlo
-cd mirlo
+# Install dependencies
+npm install
 
-# Load as unpacked extension in Chrome
-# (See [INSTALL.md](INSTALL.md) for details)
+# Start dev server (HMR — changes reload automatically)
+npm run dev
+
+# Run tests
+npm test
+
+# Production build
+npm run build
+
+# Create distributable zip
+npm run zip
 ```
 
-### 2. Making Changes
-- All application code lives in the `src/` directory.
-- After making changes, go to `chrome://extensions` and click the **Reload** icon on the Mirlo card.
-- Refresh your test pages to see the changes in action.
+No manual reloading at `chrome://extensions` during development — WXT handles it.
 
-### 3. Localization
-If you add new UI elements, ensure you:
-1.  Add the string to `src/_locales/en/messages.json`.
-2.  Use the `data-i18n="messageKey"` attribute in HTML.
-3.  Add translations to the other `messages.json` files in `_locales/`.
+## Loading the Dev Build
+
+1. Run `npm run dev`
+2. Open `chrome://extensions`, enable Developer mode
+3. Click "Load unpacked" and select the `.output/chrome-mv3-dev/` directory
+4. WXT will hot-reload on file changes
+
+## Supported Languages
+
+English, Spanish, French, German. These are the languages with reliable Chrome Translator API support.
+
+## Localization
+
+UI strings live in `public/_locales/{lang}/messages.json`. To add a new string:
+1. Add the key to `public/_locales/en/messages.json`
+2. Add translations to es, fr, de message files
+3. Use `chrome.i18n.getMessage("keyName")` in TypeScript or `data-i18n="keyName"` in HTML
 
 ## Quality Standards
 
-- **Privacy First**: Never add external API calls or tracking scripts. All processing must stay local.
-- **Performance**: Keep the content script lightweight to avoid slowing down the user's browsing experience.
-- **Accessibility**: Ensure all UI elements are keyboard-navigable and have appropriate ARIA labels.
+- **Privacy first**: No external API calls, no tracking, no data collection
+- **Local AI only**: All translation via Chrome's built-in Translator API
+- **Test what you build**: Add tests for new logic in `src/__tests__/`
+- **Performance**: Keep the content script lightweight

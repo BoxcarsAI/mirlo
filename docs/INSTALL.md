@@ -1,32 +1,46 @@
 # Installation Guide
 
-Follow these steps to install Mirlo manually in your Chrome browser.
+## From Chrome Web Store
 
-## 1. Load the Extension
+Install Mirlo from the [Chrome Web Store listing](https://chromewebstore.google.com/detail/bolaihmnmcaedodmcempenkddbkolaih/).
 
-Mirlo currently supports 4 languages: **English**, **Spanish**, **French**, and **German**.
+## Manual Install (Development)
 
-1.  Open Chrome and go to `chrome://extensions`.
-2.  Turn on **Developer mode** using the toggle in the top-right corner.
-3.  Click the **Load unpacked** button.
-4.  Navigate to and select the `src` folder inside this repository.
+1. Clone the repo and build:
+   ```bash
+   git clone https://github.com/boxcarsai/mirlo
+   cd mirlo
+   npm install
+   npm run build
+   ```
+2. Open Chrome and go to `chrome://extensions`
+3. Enable **Developer mode** (toggle in top-right corner)
+4. Click **Load unpacked** and select the `.output/chrome-mv3/` directory
 
-## 2. Configure Languages
+## Configure Languages
 
-1.  Right-click the Mirlo icon in your extension toolbar (or click the puzzle piece icon to find it).
-2.  Select **Options**.
-3.  Choose your **Native Language** and your **Learning Language**.
-4.  Click **Save Settings**.
+1. Right-click the Mirlo icon in your toolbar (or find it under the puzzle piece icon)
+2. Select **Options**
+3. Choose your **Native Language** and **Learning Language**
+4. Set your preferred **Translation Density** (Low / Medium / High)
+5. Click **Save Settings**
 
-## 3. Start Reading
+## How It Works
 
-1.  Visit a website in your target language (e.g., Wikipedia, a news site, or a blog).
-2.  Hover over any paragraph. You should see a small Mirlo bird badge appear.
-3.  Click the badge to see the instant translation.
-4.  Click the translated text again to toggle back to the original.
+1. Visit a website in your native or learning language
+2. When Mirlo detects an article-like page, it asks if you want to enable translations for that domain
+3. Once enabled, individual words are automatically replaced with translations in your learning language
+4. Hover over any translated word to see the original in a tooltip
+5. Hover over a paragraph to see the Mirlo badge — click it for a full paragraph translation
+
+## Prerequisites
+
+Mirlo uses Chrome's built-in Translator API. You need:
+- Chrome 131+ (or a recent Canary/Dev channel build)
+- `chrome://flags/#translation-api` set to **Enabled**
 
 ## Troubleshooting
 
-- **No badge appearing?**: Refresh the page after loading the extension. Some sites with strict security policies may prevent script injection.
-- **Translation not working?**: Mirlo requires Chrome's built-in Translation API. Ensure your Chrome browser is up to date.
-- **Language not detected?**: Make sure the site's content matches your "Learning Language" setting.
+- **No translations appearing?** Check that the Translator API flag is enabled and Chrome is up to date.
+- **No activation prompt?** Mirlo only prompts on article-like pages. Try a news site or Wikipedia.
+- **Wrong translation direction?** Mirlo detects paragraph language automatically. If the page has mixed languages, each paragraph translates based on its detected language.

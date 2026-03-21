@@ -42,8 +42,14 @@ Mirlo is a free Chrome extension that helps language learners read real web cont
 
 - Extension works with 4 languages (En, Es, Fr, De)
 - Submitted for public listing on Chrome Web Store (2026-03-20, pending review): https://chromewebstore.google.com/detail/bolaihmnmcaedodmcempenkddbkolaih/
-- i18n GA milestone complete (10/11 tasks done; screenshots deferred)
-- **Next milestone**: First real users → Toucan parity
+- Built on WXT framework with TypeScript and Vitest (168 tests)
+- **Toucan parity milestone nearly complete:**
+  - Word-level translation with inline replacement
+  - Hover tooltips (shadow DOM isolated) showing original word
+  - Translation density control (Low / Medium / High)
+  - Per-paragraph language detection (handles mixed-language pages)
+  - Stopword filtering to skip words the API mistranslates
+- **Remaining:** Cross-site QA (TASK-24), then Go Public marketing push
 
 ## Reference
 
