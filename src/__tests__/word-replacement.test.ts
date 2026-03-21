@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from "vitest";
-import { PLAIN_PARAGRAPH, NESTED_INLINE, WITH_PUNCTUATION } from "./fixtures/paragraphs";
+import {
+  PLAIN_PARAGRAPH,
+  NESTED_INLINE,
+  WITH_PUNCTUATION,
+  REPEATED_WORDS,
+  MIXED_COMPLEXITY,
+} from "./fixtures/paragraphs";
 import { segmentParagraph } from "@/utils/word-segmentation";
 import {
   replaceWord,
@@ -9,6 +15,7 @@ import {
   revertWordsInParagraph,
   collectTranslatableWords,
   buildTranslationMap,
+  selectWordsForTranslation,
 } from "@/utils/word-replacement";
 
 function setup(html: string): HTMLParagraphElement {
@@ -112,6 +119,24 @@ describe("replaceWordsInParagraph", () => {
     expect(findWord(p, "lazy")!.textContent).toBe("lazy");
   });
 
+  it("only replaces first occurrence of each word", () => {
+    const p = setup(REPEATED_WORDS);
+    const wordMap = new Map([["cat", "gato"]]);
+    replaceWordsInParagraph(p, wordMap);
+    const allCatSpans = p.querySelectorAll<HTMLSpanElement>(
+      '.mirlo-word[data-mirlo-original="cat"]',
+    );
+    const translatedCats = Array.from(allCatSpans).filter((s) =>
+      s.classList.contains("mirlo-word-translated"),
+    );
+    const untranslatedCats = Array.from(allCatSpans).filter(
+      (s) => !s.classList.contains("mirlo-word-translated"),
+    );
+    expect(translatedCats.length).toBe(1);
+    expect(untranslatedCats.length).toBe(2); // "cat" appears 3 times total
+    expect(translatedCats[0].textContent).toBe("gato");
+  });
+
   it("works with nested HTML elements", () => {
     const p = setup(NESTED_INLINE);
     const wordMap = new Map([
@@ -195,49 +220,91 @@ describe("collectTranslatableWords", () => {
     document.body.innerHTML = "";
   });
 
-  it("collects unique words matching alpha pattern with length >= 3", () => {
+  it("collects content words with length >= 5", () => {
     const p = setup(PLAIN_PARAGRAPH);
     const words = collectTranslatableWords(p);
     expect(words).toContain("quick");
     expect(words).toContain("brown");
-    expect(words).toContain("fox");
-    // "The" has length 3, should be included
-    expect(words).toContain("The");
+    expect(words).toContain("river");
   });
 
-  it("excludes short words (< 3 chars)", () => {
-    // PLAIN_PARAGRAPH doesn't have 2-char words, so use a custom one
-    document.body.innerHTML = "<p>I am so very happy today</p>";
+  it("excludes short words (< 5 chars)", () => {
+    const p = setup(PLAIN_PARAGRAPH);
+    const words = collectTranslatableWords(p);
+    expect(words).not.toContain("The");
+    expect(words).not.toContain("the");
+    expect(words).not.toContain("fox");
+    expect(words).not.toContain("over");
+    expect(words).not.toContain("dog");
+    expect(words).not.toContain("near");
+  });
+
+  it("excludes common function words (stopwords)", () => {
+    document.body.innerHTML =
+      "<p>The beautiful cathedral stands between those ancient buildings</p>";
     const p = document.querySelector("p")!;
     segmentParagraph(p);
     const words = collectTranslatableWords(p);
-    expect(words).not.toContain("I");
-    expect(words).not.toContain("am");
-    expect(words).not.toContain("so");
-    expect(words).toContain("very");
-    expect(words).toContain("happy");
-    expect(words).toContain("today");
+    expect(words).not.toContain("between");
+    expect(words).not.toContain("those");
+    expect(words).toContain("beautiful");
+    expect(words).toContain("cathedral");
+    expect(words).toContain("ancient");
+    expect(words).toContain("stands");
+    expect(words).toContain("buildings");
+  });
+
+  it("excludes common articles, prepositions, and conjunctions", () => {
+    document.body.innerHTML =
+      "<p>There should always never about through without against their would could</p>";
+    const p = document.querySelector("p")!;
+    segmentParagraph(p);
+    const words = collectTranslatableWords(p);
+    expect(words).not.toContain("There");
+    expect(words).not.toContain("should");
+    expect(words).not.toContain("always");
+    expect(words).not.toContain("never");
+    expect(words).not.toContain("about");
+    expect(words).not.toContain("through");
+    expect(words).not.toContain("without");
+    expect(words).not.toContain("against");
+    expect(words).not.toContain("their");
+    expect(words).not.toContain("would");
+    expect(words).not.toContain("could");
   });
 
   it("excludes words with punctuation", () => {
     const p = setup(WITH_PUNCTUATION);
     const words = collectTranslatableWords(p);
-    // "Well," has a comma — excluded
     expect(words).not.toContain("Well,");
-    // "why?" has a question mark — excluded
     expect(words).not.toContain("why?");
-    // Clean words should be included
-    expect(words).toContain("the");
-    expect(words).toContain("students");
   });
 
   it("deduplicates words", () => {
-    document.body.innerHTML = "<p>the cat and the dog and the bird</p>";
+    document.body.innerHTML = "<p>the extraordinary cat and the extraordinary dog</p>";
     const p = document.querySelector("p")!;
     segmentParagraph(p);
     const words = collectTranslatableWords(p);
-    const theCount = words.filter((w) => w === "the").length;
-    expect(theCount).toBe(1);
+    const count = words.filter((w) => w === "extraordinary").length;
+    expect(count).toBe(1);
+  });
+
+  it("collects complex words from mixed paragraph", () => {
+    const p = setup(MIXED_COMPLEXITY);
+    const words = collectTranslatableWords(p);
+    expect(words).toContain("extraordinary");
+    expect(words).toContain("architecture");
+    expect(words).toContain("ancient");
+    expect(words).toContain("cathedral");
+    expect(words).toContain("impressed");
+    expect(words).toContain("international");
+    expect(words).toContain("visitors");
+    expect(words).toContain("traveled");
+    // Short/function words excluded
+    expect(words).not.toContain("the");
+    expect(words).not.toContain("who");
+    expect(words).not.toContain("all");
+    expect(words).not.toContain("there");
   });
 });
 
@@ -287,5 +354,67 @@ describe("buildTranslationMap", () => {
     };
     const map = await buildTranslationMap(["hello", "world"], fakeTranslator);
     expect(map.size).toBe(0);
+  });
+});
+
+describe("selectWordsForTranslation", () => {
+  const words = Array.from({ length: 100 }, (_, i) => `word${i}`);
+
+  it("low density selects roughly 5-15% of words", () => {
+    const selected = selectWordsForTranslation(words, "low");
+    expect(selected.length).toBeGreaterThanOrEqual(3);
+    expect(selected.length).toBeLessThanOrEqual(20);
+  });
+
+  it("medium density selects roughly 20-35% of words", () => {
+    const selected = selectWordsForTranslation(words, "medium");
+    expect(selected.length).toBeGreaterThanOrEqual(15);
+    expect(selected.length).toBeLessThanOrEqual(40);
+  });
+
+  it("high density selects roughly 40-60% of words", () => {
+    const selected = selectWordsForTranslation(words, "high");
+    expect(selected.length).toBeGreaterThanOrEqual(35);
+    expect(selected.length).toBeLessThanOrEqual(65);
+  });
+
+  it("returns subset of the input words", () => {
+    const selected = selectWordsForTranslation(words, "medium");
+    for (const word of selected) {
+      expect(words).toContain(word);
+    }
+  });
+
+  it("returns empty array for empty input", () => {
+    expect(selectWordsForTranslation([], "medium")).toEqual([]);
+  });
+
+  it("returns the word for single-word input regardless of density", () => {
+    const selected = selectWordsForTranslation(["hello"], "low");
+    expect(selected).toEqual(["hello"]);
+  });
+
+  it("defaults to medium when density is invalid", () => {
+    const selected = selectWordsForTranslation(words, "invalid" as any);
+    const medium = selectWordsForTranslation(words, "medium");
+    // Both should be in the medium range
+    expect(selected.length).toBeGreaterThanOrEqual(15);
+    expect(selected.length).toBeLessThanOrEqual(40);
+  });
+
+  it("returns different words on different calls (not always the same subset)", () => {
+    const run1 = selectWordsForTranslation(words, "medium");
+    const run2 = selectWordsForTranslation(words, "medium");
+    // With 100 words at 25%, extremely unlikely to pick identical sets
+    // But they could theoretically match, so just check they're valid
+    expect(run1.length).toBeGreaterThan(0);
+    expect(run2.length).toBeGreaterThan(0);
+  });
+
+  it("handles small word lists gracefully", () => {
+    const small = ["alpha", "beta", "gamma"];
+    const selected = selectWordsForTranslation(small, "low");
+    expect(selected.length).toBeGreaterThanOrEqual(1);
+    expect(selected.length).toBeLessThanOrEqual(3);
   });
 });

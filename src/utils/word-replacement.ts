@@ -16,11 +16,13 @@ export function replaceWordsInParagraph(
   paragraph: HTMLParagraphElement,
   wordMap: Map<string, string>,
 ): void {
+  const replaced = new Set<string>();
   const wordSpans = paragraph.querySelectorAll<HTMLSpanElement>(".mirlo-word");
   for (const span of wordSpans) {
     const original = span.dataset.mirloOriginal;
-    if (original && wordMap.has(original)) {
+    if (original && wordMap.has(original) && !replaced.has(original)) {
       replaceWord(span, wordMap.get(original)!);
+      replaced.add(original);
     }
   }
 }
@@ -37,7 +39,21 @@ export interface Translator {
 }
 
 const WORD_PATTERN = /^[a-zA-ZÀ-ÿ]+$/;
-const MIN_WORD_LENGTH = 3;
+const MIN_WORD_LENGTH = 5;
+
+const STOPWORDS = new Set([
+  // Articles & determiners
+  "about", "above", "after", "again", "against", "along", "among",
+  "around", "before", "below", "beneath", "beside", "between",
+  "beyond", "during", "every", "except", "inside", "other",
+  "outside", "since", "their", "there", "these", "those",
+  "through", "under", "until", "where", "which", "while",
+  "whose", "without", "would", "could", "should", "might",
+  "still", "being", "having", "doing", "going", "taken",
+  "never", "always", "often", "sometimes", "already", "either",
+  "neither", "rather", "quite", "really", "perhaps", "maybe",
+  "another", "become", "became", "because", "cannot",
+]);
 
 export function collectTranslatableWords(paragraph: HTMLParagraphElement): string[] {
   const spans = paragraph.querySelectorAll<HTMLSpanElement>(".mirlo-word");
@@ -45,12 +61,42 @@ export function collectTranslatableWords(paragraph: HTMLParagraphElement): strin
   const words: string[] = [];
   for (const span of spans) {
     const word = span.dataset.mirloOriginal;
-    if (word && WORD_PATTERN.test(word) && word.length >= MIN_WORD_LENGTH && !seen.has(word)) {
-      seen.add(word);
-      words.push(word);
-    }
+    if (!word) continue;
+    if (!WORD_PATTERN.test(word)) continue;
+    if (word.length < MIN_WORD_LENGTH) continue;
+    if (STOPWORDS.has(word.toLowerCase())) continue;
+    if (seen.has(word)) continue;
+    seen.add(word);
+    words.push(word);
   }
   return words;
+}
+
+import type { TranslationDensity } from "@/utils/storage-keys";
+
+const DENSITY_RATES: Record<TranslationDensity, number> = {
+  low: 0.08,
+  medium: 0.25,
+  high: 0.5,
+};
+
+export function selectWordsForTranslation(
+  words: string[],
+  density: TranslationDensity,
+): string[] {
+  if (words.length === 0) return [];
+  if (words.length === 1) return [...words];
+
+  const rate = DENSITY_RATES[density] ?? DENSITY_RATES.medium;
+  const count = Math.max(1, Math.round(words.length * rate));
+
+  // Fisher-Yates shuffle on a copy, then take first `count`
+  const shuffled = [...words];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
 }
 
 export async function buildTranslationMap(

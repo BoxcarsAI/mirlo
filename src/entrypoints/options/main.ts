@@ -8,35 +8,40 @@ const DEFAULT_LEARNING = "es";
 
 const nativeSelect = document.getElementById("native-language") as HTMLSelectElement;
 const learningSelect = document.getElementById("learning-language") as HTMLSelectElement;
+const densitySelect = document.getElementById("translation-density") as HTMLSelectElement;
 const saveButton = document.getElementById("save-button") as HTMLButtonElement;
 const statusEl = document.getElementById("save-status")!;
 
-function getSettings(): Promise<{ native: string; learning: string }> {
+const DEFAULT_DENSITY = "medium";
+
+function getSettings(): Promise<{ native: string; learning: string; density: string }> {
   return new Promise((resolve) => {
     chrome.storage.sync.get(
-      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
+      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage, STORAGE_KEYS.translationDensity],
       (result) => {
         if (chrome.runtime.lastError) {
           console.error("Storage read error:", chrome.runtime.lastError);
-          resolve({ native: DEFAULT_NATIVE, learning: DEFAULT_LEARNING });
+          resolve({ native: DEFAULT_NATIVE, learning: DEFAULT_LEARNING, density: DEFAULT_DENSITY });
           return;
         }
 
         resolve({
           native: result[STORAGE_KEYS.nativeLanguage] || DEFAULT_NATIVE,
           learning: result[STORAGE_KEYS.learningLanguage] || DEFAULT_LEARNING,
+          density: result[STORAGE_KEYS.translationDensity] || DEFAULT_DENSITY,
         });
       },
     );
   });
 }
 
-function saveSettings(native: string, learning: string): Promise<boolean> {
+function saveSettings(native: string, learning: string, density: string): Promise<boolean> {
   return new Promise((resolve) => {
     chrome.storage.sync.set(
       {
         [STORAGE_KEYS.nativeLanguage]: native,
         [STORAGE_KEYS.learningLanguage]: learning,
+        [STORAGE_KEYS.translationDensity]: density,
       },
       () => {
         if (chrome.runtime.lastError) {
@@ -96,11 +101,13 @@ async function init(): Promise<void> {
   const settings = await getSettings();
   nativeSelect.value = settings.native;
   learningSelect.value = settings.learning;
+  densitySelect.value = settings.density;
 }
 
 saveButton.addEventListener("click", async () => {
   const native = nativeSelect.value;
   const learning = learningSelect.value;
+  const density = densitySelect.value;
 
   const validation = validateLanguages(native, learning);
   if (!validation.valid) {
@@ -111,7 +118,7 @@ saveButton.addEventListener("click", async () => {
   saveButton.disabled = true;
   saveButton.textContent = chrome.i18n.getMessage("optionsSaveStatusSaving");
 
-  const saved = await saveSettings(native, learning);
+  const saved = await saveSettings(native, learning, density);
 
   if (saved) {
     showStatus(chrome.i18n.getMessage("optionsSaveStatusSuccess"), "success");

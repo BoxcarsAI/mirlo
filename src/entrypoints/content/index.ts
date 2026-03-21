@@ -11,6 +11,7 @@ import {
   revertWordsInParagraph,
   collectTranslatableWords,
   buildTranslationMap,
+  selectWordsForTranslation,
 } from "@/utils/word-replacement";
 import { showWordTooltip, scheduleHideWordTooltip, destroyWordTooltip } from "@/utils/word-tooltip";
 
@@ -29,7 +30,9 @@ let mirloActive = false;
 let listenersBound = false;
 let activationToastEl: HTMLDivElement | null = null;
 let activationDismissTimer: ReturnType<typeof setTimeout> | null = null;
+import { type TranslationDensity, DEFAULT_DENSITY } from "@/utils/storage-keys";
 let userNativeLanguage = "en";
+let userTranslationDensity: TranslationDensity = DEFAULT_DENSITY;
 let userLearningLanguage = "es";
 const MARKER_TEXT = "\u00b7";
 
@@ -128,18 +131,19 @@ async function getPageLanguageInfo(): Promise<LanguageInfo> {
   };
 }
 
-async function getLanguagePreferences(): Promise<{ native: string; learning: string }> {
+async function getLanguagePreferences(): Promise<{ native: string; learning: string; density: TranslationDensity }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
-      resolve({ native: "en", learning: "es" });
+      resolve({ native: "en", learning: "es", density: DEFAULT_DENSITY });
       return;
     }
     chrome.storage.sync.get(
-      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
+      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage, STORAGE_KEYS.translationDensity],
       (result) => {
         resolve({
           native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
           learning: result?.[STORAGE_KEYS.learningLanguage] || "es",
+          density: (result?.[STORAGE_KEYS.translationDensity] as TranslationDensity) || DEFAULT_DENSITY,
         });
       },
     );
@@ -150,6 +154,7 @@ async function initializeLanguageSettings(): Promise<void> {
   const prefs = await getLanguagePreferences();
   userNativeLanguage = prefs.native;
   userLearningLanguage = prefs.learning;
+  userTranslationDensity = prefs.density;
 }
 
 function getStoredDomains(): Promise<StoredDomains> {
@@ -210,9 +215,10 @@ async function translateWordsInParagraphViaApi(
 ): Promise<void> {
   if (!isSegmented(paragraph)) segmentParagraph(paragraph);
 
-  const words = collectTranslatableWords(paragraph);
-  if (words.length === 0) return;
+  const allWords = collectTranslatableWords(paragraph);
+  if (allWords.length === 0) return;
 
+  const words = selectWordsForTranslation(allWords, userTranslationDensity);
   const wordMap = await buildTranslationMap(words, translator);
   if (wordMap.size > 0) {
     replaceWordsInParagraph(paragraph, wordMap);

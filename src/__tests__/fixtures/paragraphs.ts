@@ -40,3 +40,11 @@ export const ALREADY_SEGMENTED =
 
 /** Empty paragraph */
 export const EMPTY_PARAGRAPH = "<p></p>";
+
+/** Paragraph with repeated words (for dedup testing) */
+export const REPEATED_WORDS =
+  "<p>The cat sat on the mat and the cat looked at the other cat nearby</p>";
+
+/** Paragraph with mix of simple and complex words */
+export const MIXED_COMPLEXITY =
+  "<p>The extraordinary architecture of the ancient cathedral impressed all the international visitors who traveled there</p>";
