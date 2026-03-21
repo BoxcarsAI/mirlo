@@ -4,7 +4,7 @@ import { STORAGE_KEYS } from "@/utils/storage-keys";
 import { getLanguageName } from "@/utils/language";
 import { isArticleLike } from "@/utils/article-detection";
 import { SKIP_SELECTORS, getParagraphText, isEligibleParagraph } from "@/utils/paragraph-filter";
-import { getHtmlLanguage, getNormalizedPageLanguage, getLanguagePairForPage } from "@/utils/translation";
+import { getHtmlLanguage, getNormalizedPageLanguage, getLanguagePairForPage, getLanguagePairForText, type LanguageDetector } from "@/utils/translation";
 import { segmentParagraph, isSegmented } from "@/utils/word-segmentation";
 import {
   replaceWordsInParagraph,
@@ -35,6 +35,20 @@ let userNativeLanguage = "en";
 let userTranslationDensity: TranslationDensity = DEFAULT_DENSITY;
 let userLearningLanguage = "es";
 const MARKER_TEXT = "\u00b7";
+let cachedDetector: LanguageDetector | null = null;
+
+async function getDetector(): Promise<LanguageDetector | null> {
+  if (cachedDetector) return cachedDetector;
+  if (!("LanguageDetector" in self)) return null;
+  try {
+    const availability = await (self as any).LanguageDetector.availability();
+    if (availability !== "available" && availability !== "downloadable") return null;
+    cachedDetector = await (self as any).LanguageDetector.create();
+    return cachedDetector;
+  } catch {
+    return null;
+  }
+}
 
 interface LanguageInfo {
   htmlLang: string;
@@ -225,39 +239,62 @@ async function translateWordsInParagraphViaApi(
   }
 }
 
-async function translateWordsOnPage(): Promise<void> {
-  if (!("Translator" in self)) return;
-
-  const languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
-  if (!languagePair) return;
-  const { sourceLanguage, targetLanguage } = languagePair;
+async function getOrCreateTranslator(
+  sourceLanguage: string,
+  targetLanguage: string,
+  cache: Map<string, any>,
+): Promise<any | null> {
+  const key = `${sourceLanguage}:${targetLanguage}`;
+  if (cache.has(key)) return cache.get(key);
 
   try {
     const availability = await (self as any).Translator.availability({
       sourceLanguage,
       targetLanguage,
     });
-    if (availability !== "available" && availability !== "downloadable") return;
-  } catch {
-    return;
-  }
-
-  let translator: any;
-  try {
-    translator = await (self as any).Translator.create({
+    if (availability !== "available" && availability !== "downloadable") return null;
+    const translator = await (self as any).Translator.create({
       sourceLanguage,
       targetLanguage,
       monitor(m: any) {
         m.addEventListener("downloadprogress", () => {});
       },
     });
+    cache.set(key, translator);
+    return translator;
   } catch {
-    return;
+    return null;
   }
+}
+
+async function translateWordsOnPage(): Promise<void> {
+  if (!("Translator" in self)) return;
+
+  const detector = await getDetector();
+  const translatorCache = new Map<string, any>();
 
   const paragraphs = Array.from(document.querySelectorAll("p")) as HTMLParagraphElement[];
   for (const paragraph of paragraphs) {
     if (!isEligibleParagraph(paragraph)) continue;
+
+    const text = paragraph.innerText?.trim() || "";
+    let languagePair = detector
+      ? await getLanguagePairForText(text, userNativeLanguage, userLearningLanguage, detector)
+      : null;
+
+    // Fall back to page-level detection
+    if (!languagePair) {
+      languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+    }
+    if (!languagePair) continue;
+
+    const translator = await getOrCreateTranslator(
+      languagePair.sourceLanguage,
+      languagePair.targetLanguage,
+      translatorCache,
+    );
+    if (!translator) continue;
+
     await translateWordsInParagraphViaApi(paragraph, translator);
   }
 }
@@ -332,7 +369,14 @@ async function translateParagraph(paragraph: HTMLParagraphElement): Promise<void
     return;
   }
 
-  const languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+  const text = getParagraphText(paragraph);
+  const detector = await getDetector();
+  let languagePair = detector
+    ? await getLanguagePairForText(text, userNativeLanguage, userLearningLanguage, detector)
+    : null;
+  if (!languagePair) {
+    languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+  }
   if (!languagePair) return;
   const { sourceLanguage, targetLanguage } = languagePair;
 

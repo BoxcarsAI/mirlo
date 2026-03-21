@@ -4,6 +4,8 @@ import {
   getHtmlLanguage,
   getNormalizedPageLanguage,
   getLanguagePairForPage,
+  getLanguagePairForText,
+  type LanguageDetector,
 } from "@/utils/translation";
 
 describe("getHtmlLanguage", () => {
@@ -112,5 +114,88 @@ describe("getLanguagePairForPage", () => {
     document.documentElement.lang = "fr";
     const pair = getLanguagePairForPage("fr", "de");
     expect(pair).toEqual({ sourceLanguage: "fr", targetLanguage: "de" });
+  });
+});
+
+function fakeDetector(lang: string, confidence = 0.95): LanguageDetector {
+  return {
+    detect: async () => [{ detectedLanguage: lang, confidence }],
+  };
+}
+
+describe("getLanguagePairForText", () => {
+  it("detects native language text → translate to learning", async () => {
+    const pair = await getLanguagePairForText(
+      "The quick brown fox",
+      "en",
+      "es",
+      fakeDetector("en"),
+    );
+    expect(pair).toEqual({ sourceLanguage: "en", targetLanguage: "es" });
+  });
+
+  it("detects learning language text → translate to native", async () => {
+    const pair = await getLanguagePairForText(
+      "El gato negro duerme",
+      "en",
+      "es",
+      fakeDetector("es"),
+    );
+    expect(pair).toEqual({ sourceLanguage: "es", targetLanguage: "en" });
+  });
+
+  it("returns null when detected language matches neither", async () => {
+    const pair = await getLanguagePairForText(
+      "Le petit chat dort",
+      "en",
+      "es",
+      fakeDetector("fr"),
+    );
+    expect(pair).toBeNull();
+  });
+
+  it("returns null when confidence is too low", async () => {
+    const pair = await getLanguagePairForText(
+      "ambiguous text",
+      "en",
+      "es",
+      fakeDetector("en", 0.3),
+    );
+    expect(pair).toBeNull();
+  });
+
+  it("returns null when detector returns empty results", async () => {
+    const detector: LanguageDetector = { detect: async () => [] };
+    const pair = await getLanguagePairForText("some text", "en", "es", detector);
+    expect(pair).toBeNull();
+  });
+
+  it("returns null when detector throws", async () => {
+    const detector: LanguageDetector = {
+      detect: async () => { throw new Error("API error"); },
+    };
+    const pair = await getLanguagePairForText("some text", "en", "es", detector);
+    expect(pair).toBeNull();
+  });
+
+  it("returns null when text is too short", async () => {
+    const pair = await getLanguagePairForText(
+      "hi",
+      "en",
+      "es",
+      fakeDetector("en"),
+    );
+    expect(pair).toBeNull();
+  });
+
+  it("handles Reddit scenario: English page with Spanish content", async () => {
+    // Page says lang="en" but paragraph is actually Spanish
+    const pair = await getLanguagePairForText(
+      "Hola amigos, estoy buscando recomendaciones para restaurantes en Granada",
+      "en",
+      "es",
+      fakeDetector("es", 0.97),
+    );
+    expect(pair).toEqual({ sourceLanguage: "es", targetLanguage: "en" });
   });
 });
