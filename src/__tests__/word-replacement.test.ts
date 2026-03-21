@@ -1,12 +1,14 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from "vitest";
-import { PLAIN_PARAGRAPH, NESTED_INLINE } from "./fixtures/paragraphs";
+import { PLAIN_PARAGRAPH, NESTED_INLINE, WITH_PUNCTUATION } from "./fixtures/paragraphs";
 import { segmentParagraph } from "@/utils/word-segmentation";
 import {
   replaceWord,
   revertWord,
   replaceWordsInParagraph,
   revertWordsInParagraph,
+  collectTranslatableWords,
+  buildTranslationMap,
 } from "@/utils/word-replacement";
 
 function setup(html: string): HTMLParagraphElement {
@@ -185,5 +187,105 @@ describe("revertWordsInParagraph", () => {
     // No translations applied — revert should not throw or change anything
     revertWordsInParagraph(p);
     expect(findWord(p, "quick")!.textContent).toBe("quick");
+  });
+});
+
+describe("collectTranslatableWords", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("collects unique words matching alpha pattern with length >= 3", () => {
+    const p = setup(PLAIN_PARAGRAPH);
+    const words = collectTranslatableWords(p);
+    expect(words).toContain("quick");
+    expect(words).toContain("brown");
+    expect(words).toContain("fox");
+    // "The" has length 3, should be included
+    expect(words).toContain("The");
+  });
+
+  it("excludes short words (< 3 chars)", () => {
+    // PLAIN_PARAGRAPH doesn't have 2-char words, so use a custom one
+    document.body.innerHTML = "<p>I am so very happy today</p>";
+    const p = document.querySelector("p")!;
+    segmentParagraph(p);
+    const words = collectTranslatableWords(p);
+    expect(words).not.toContain("I");
+    expect(words).not.toContain("am");
+    expect(words).not.toContain("so");
+    expect(words).toContain("very");
+    expect(words).toContain("happy");
+    expect(words).toContain("today");
+  });
+
+  it("excludes words with punctuation", () => {
+    const p = setup(WITH_PUNCTUATION);
+    const words = collectTranslatableWords(p);
+    // "Well," has a comma — excluded
+    expect(words).not.toContain("Well,");
+    // "why?" has a question mark — excluded
+    expect(words).not.toContain("why?");
+    // Clean words should be included
+    expect(words).toContain("the");
+    expect(words).toContain("students");
+  });
+
+  it("deduplicates words", () => {
+    document.body.innerHTML = "<p>the cat and the dog and the bird</p>";
+    const p = document.querySelector("p")!;
+    segmentParagraph(p);
+    const words = collectTranslatableWords(p);
+    const theCount = words.filter((w) => w === "the").length;
+    expect(theCount).toBe(1);
+  });
+});
+
+describe("buildTranslationMap", () => {
+  it("builds a map from words using a translator", async () => {
+    const fakeTranslator = {
+      translate: async (word: string) => {
+        const dict: Record<string, string> = { fox: "zorro", dog: "perro", cat: "gato" };
+        return dict[word] || word;
+      },
+    };
+    const map = await buildTranslationMap(["fox", "dog", "cat"], fakeTranslator);
+    expect(map.get("fox")).toBe("zorro");
+    expect(map.get("dog")).toBe("perro");
+    expect(map.get("cat")).toBe("gato");
+  });
+
+  it("skips words where translation equals original (case-insensitive)", async () => {
+    const fakeTranslator = {
+      translate: async (word: string) => {
+        // "Internet" translates to "Internet" — same word
+        if (word === "Internet") return "Internet";
+        return "translated_" + word;
+      },
+    };
+    const map = await buildTranslationMap(["Internet", "hello"], fakeTranslator);
+    expect(map.has("Internet")).toBe(false);
+    expect(map.get("hello")).toBe("translated_hello");
+  });
+
+  it("skips words that throw during translation", async () => {
+    const fakeTranslator = {
+      translate: async (word: string) => {
+        if (word === "broken") throw new Error("API error");
+        return "ok_" + word;
+      },
+    };
+    const map = await buildTranslationMap(["good", "broken", "fine"], fakeTranslator);
+    expect(map.get("good")).toBe("ok_good");
+    expect(map.has("broken")).toBe(false);
+    expect(map.get("fine")).toBe("ok_fine");
+  });
+
+  it("returns empty map when all translations match originals", async () => {
+    const fakeTranslator = {
+      translate: async (word: string) => word,
+    };
+    const map = await buildTranslationMap(["hello", "world"], fakeTranslator);
+    expect(map.size).toBe(0);
   });
 });

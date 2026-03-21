@@ -6,7 +6,12 @@ import { isArticleLike } from "@/utils/article-detection";
 import { SKIP_SELECTORS, getParagraphText, isEligibleParagraph } from "@/utils/paragraph-filter";
 import { getHtmlLanguage, getNormalizedPageLanguage, getLanguagePairForPage } from "@/utils/translation";
 import { segmentParagraph, isSegmented } from "@/utils/word-segmentation";
-import { replaceWordsInParagraph, revertWordsInParagraph } from "@/utils/word-replacement";
+import {
+  replaceWordsInParagraph,
+  revertWordsInParagraph,
+  collectTranslatableWords,
+  buildTranslationMap,
+} from "@/utils/word-replacement";
 
 const TOAST_AUTO_DISMISS_MS = 8000;
 
@@ -203,36 +208,13 @@ async function translateWordsInParagraphViaApi(
   translator: any,
 ): Promise<void> {
   if (!isSegmented(paragraph)) segmentParagraph(paragraph);
-  const wordSpans = paragraph.querySelectorAll<HTMLSpanElement>(".mirlo-word");
-  if (wordSpans.length === 0) return;
 
-  const uniqueWords = new Set<string>();
-  for (const span of wordSpans) {
-    const word = span.dataset.mirloOriginal;
-    if (word && /^[a-zA-ZÀ-ÿ]+$/.test(word) && word.length > 2) {
-      uniqueWords.add(word);
-    }
-  }
-  if (uniqueWords.size === 0) return;
+  const words = collectTranslatableWords(paragraph);
+  if (words.length === 0) return;
 
-  const wordList = Array.from(uniqueWords);
-  const batch = wordList.join("|");
-  try {
-    const translated = await translator.translate(batch);
-    const translatedWords = translated.split("|");
-    if (translatedWords.length !== wordList.length) return;
-
-    const wordMap = new Map<string, string>();
-    for (let i = 0; i < wordList.length; i++) {
-      const original = wordList[i];
-      const result = translatedWords[i].trim();
-      if (result && result.toLowerCase() !== original.toLowerCase()) {
-        wordMap.set(original, result);
-      }
-    }
+  const wordMap = await buildTranslationMap(words, translator);
+  if (wordMap.size > 0) {
     replaceWordsInParagraph(paragraph, wordMap);
-  } catch (error) {
-    console.log("Word translation failed", error);
   }
 }
 
