@@ -273,6 +273,24 @@ describe("collectTranslatableWords", () => {
     expect(words).not.toContain("could");
   });
 
+  it("excludes gerunds that the Translator API mistranslates as nouns", () => {
+    document.body.innerHTML =
+      "<p>running eating thinking playing writing building learning reading speaking working</p>";
+    const p = document.querySelector("p")!;
+    segmentParagraph(p);
+    const words = collectTranslatableWords(p);
+    expect(words).not.toContain("running");
+    expect(words).not.toContain("eating");
+    expect(words).not.toContain("thinking");
+    expect(words).not.toContain("playing");
+    expect(words).not.toContain("writing");
+    expect(words).not.toContain("building");
+    expect(words).not.toContain("learning");
+    expect(words).not.toContain("reading");
+    expect(words).not.toContain("speaking");
+    expect(words).not.toContain("working");
+  });
+
   it("excludes words with punctuation", () => {
     const p = setup(WITH_PUNCTUATION);
     const words = collectTranslatableWords(p);

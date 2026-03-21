@@ -53,6 +53,11 @@ const STOPWORDS = new Set([
   "never", "always", "often", "sometimes", "already", "either",
   "neither", "rather", "quite", "really", "perhaps", "maybe",
   "another", "become", "became", "because", "cannot",
+  // Gerunds the Translator API mistranslates as nouns when sent individually
+  // e.g. "running"→"funcionamiento", "building"→"edificio"
+  // See: backlog/decisions/decision-1
+  "running", "eating", "thinking", "playing", "writing",
+  "building", "learning", "reading", "speaking", "working",
 ]);
 
 export function collectTranslatableWords(paragraph: HTMLParagraphElement): string[] {
