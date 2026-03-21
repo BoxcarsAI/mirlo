@@ -12,6 +12,7 @@ import {
   collectTranslatableWords,
   buildTranslationMap,
 } from "@/utils/word-replacement";
+import { showWordTooltip, scheduleHideWordTooltip, destroyWordTooltip } from "@/utils/word-tooltip";
 
 const TOAST_AUTO_DISMISS_MS = 8000;
 
@@ -549,10 +550,18 @@ function activateMirlo(): void {
     listenersBound = true;
     document.addEventListener("mouseover", (event) => {
       if (!mirloActive) return;
+      const target = event.target as Element;
+      if (target?.classList?.contains("mirlo-word-translated")) {
+        showWordTooltip(target as HTMLSpanElement);
+      }
       handleParagraphHover(event.target);
     });
     document.addEventListener("mouseout", (event) => {
       if (!mirloActive) return;
+      const target = event.target as Element;
+      if (target?.classList?.contains("mirlo-word-translated")) {
+        scheduleHideWordTooltip();
+      }
       const related = event.relatedTarget as Node | null;
       if (related && badgeEl && badgeEl.contains(related)) return;
       if (!activeParagraph || !activeParagraph.contains(related)) {
@@ -569,6 +578,7 @@ function deactivateMirlo(): void {
   cancelInFlightTranslation();
   hideBadge();
   hideTooltip();
+  destroyWordTooltip();
 }
 
 function removeActivationToast(): void {

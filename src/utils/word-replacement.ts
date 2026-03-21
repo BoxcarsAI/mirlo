@@ -1,7 +1,7 @@
 export function replaceWord(span: HTMLSpanElement, translatedText: string): void {
   span.textContent = translatedText;
   span.classList.add("mirlo-word-translated");
-  span.title = span.dataset.mirloOriginal || "";
+  span.dataset.mirloTranslation = translatedText;
 }
 
 export function revertWord(span: HTMLSpanElement): void {
@@ -9,7 +9,7 @@ export function revertWord(span: HTMLSpanElement): void {
   if (!original) return;
   span.textContent = original;
   span.classList.remove("mirlo-word-translated");
-  span.title = "";
+  delete span.dataset.mirloTranslation;
 }
 
 export function replaceWordsInParagraph(

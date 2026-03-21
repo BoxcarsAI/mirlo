@@ -41,11 +41,11 @@ describe("replaceWord", () => {
     expect(span.classList.contains("mirlo-word-translated")).toBe(true);
   });
 
-  it("sets title attribute to original word", () => {
+  it("stores translation in data-mirlo-translation", () => {
     const p = setup(PLAIN_PARAGRAPH);
     const span = findWord(p, "fox")!;
     replaceWord(span, "zorro");
-    expect(span.title).toBe("fox");
+    expect(span.dataset.mirloTranslation).toBe("zorro");
   });
 
   it("preserves data-mirlo-original", () => {
@@ -77,12 +77,12 @@ describe("revertWord", () => {
     expect(span.classList.contains("mirlo-word-translated")).toBe(false);
   });
 
-  it("removes title attribute", () => {
+  it("removes translation data attribute", () => {
     const p = setup(PLAIN_PARAGRAPH);
     const span = findWord(p, "fox")!;
     replaceWord(span, "zorro");
     revertWord(span);
-    expect(span.title).toBe("");
+    expect(span.dataset.mirloTranslation).toBeUndefined();
   });
 });
 
