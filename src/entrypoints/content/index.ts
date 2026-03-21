@@ -5,6 +5,8 @@ import { getLanguageName } from "@/utils/language";
 import { isArticleLike } from "@/utils/article-detection";
 import { SKIP_SELECTORS, getParagraphText, isEligibleParagraph } from "@/utils/paragraph-filter";
 import { getHtmlLanguage, getNormalizedPageLanguage, getLanguagePairForPage } from "@/utils/translation";
+import { segmentParagraph, isSegmented } from "@/utils/word-segmentation";
+import { replaceWordsInParagraph, revertWordsInParagraph } from "@/utils/word-replacement";
 
 const TOAST_AUTO_DISMISS_MS = 8000;
 
@@ -196,6 +198,81 @@ async function removeDomainFromList(key: string, domain: string): Promise<string
   return next;
 }
 
+async function translateWordsInParagraphViaApi(
+  paragraph: HTMLParagraphElement,
+  translator: any,
+): Promise<void> {
+  if (!isSegmented(paragraph)) segmentParagraph(paragraph);
+  const wordSpans = paragraph.querySelectorAll<HTMLSpanElement>(".mirlo-word");
+  if (wordSpans.length === 0) return;
+
+  const uniqueWords = new Set<string>();
+  for (const span of wordSpans) {
+    const word = span.dataset.mirloOriginal;
+    if (word && /^[a-zA-ZÀ-ÿ]+$/.test(word) && word.length > 2) {
+      uniqueWords.add(word);
+    }
+  }
+  if (uniqueWords.size === 0) return;
+
+  const wordList = Array.from(uniqueWords);
+  const batch = wordList.join("|");
+  try {
+    const translated = await translator.translate(batch);
+    const translatedWords = translated.split("|");
+    if (translatedWords.length !== wordList.length) return;
+
+    const wordMap = new Map<string, string>();
+    for (let i = 0; i < wordList.length; i++) {
+      const original = wordList[i];
+      const result = translatedWords[i].trim();
+      if (result && result.toLowerCase() !== original.toLowerCase()) {
+        wordMap.set(original, result);
+      }
+    }
+    replaceWordsInParagraph(paragraph, wordMap);
+  } catch (error) {
+    console.log("Word translation failed", error);
+  }
+}
+
+async function translateWordsOnPage(): Promise<void> {
+  if (!("Translator" in self)) return;
+
+  const languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+  if (!languagePair) return;
+  const { sourceLanguage, targetLanguage } = languagePair;
+
+  try {
+    const availability = await (self as any).Translator.availability({
+      sourceLanguage,
+      targetLanguage,
+    });
+    if (availability !== "available" && availability !== "downloadable") return;
+  } catch {
+    return;
+  }
+
+  let translator: any;
+  try {
+    translator = await (self as any).Translator.create({
+      sourceLanguage,
+      targetLanguage,
+      monitor(m: any) {
+        m.addEventListener("downloadprogress", () => {});
+      },
+    });
+  } catch {
+    return;
+  }
+
+  const paragraphs = Array.from(document.querySelectorAll("p")) as HTMLParagraphElement[];
+  for (const paragraph of paragraphs) {
+    if (!isEligibleParagraph(paragraph)) continue;
+    await translateWordsInParagraphViaApi(paragraph, translator);
+  }
+}
+
 function cancelInFlightTranslation(): void {
   translationRequestId += 1;
   translatingParagraph = null;
@@ -246,6 +323,9 @@ function revertParagraph(paragraph: HTMLParagraphElement): void {
 
 async function translateParagraph(paragraph: HTMLParagraphElement): Promise<void> {
   if (!paragraph) return;
+
+  // Clear word-level translations before paragraph translation
+  revertWordsInParagraph(paragraph);
 
   const cachedTranslation = paragraph.dataset.mirloTranslated;
   const cachedSource = paragraph.dataset.mirloSource;
@@ -482,6 +562,7 @@ function activateMirlo(): void {
   if (mirloActive) return;
   mirloActive = true;
   logAiStatus();
+  translateWordsOnPage();
   if (!listenersBound) {
     listenersBound = true;
     document.addEventListener("mouseover", (event) => {

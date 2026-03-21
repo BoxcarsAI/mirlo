@@ -10,6 +10,18 @@
   font-size: 0.85em;
 }
 
+.mirlo-word-translated {
+  color: #0f766e;
+  border-bottom: 1.5px dotted #99f6e4;
+  cursor: default;
+  transition: background-color 120ms ease;
+}
+
+.mirlo-word-translated:hover {
+  background-color: rgba(153, 246, 228, 0.18);
+  border-radius: 2px;
+}
+
 .mirlo-translated {
   text-decoration-line: underline;
   text-decoration-style: dotted;
