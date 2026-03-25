@@ -1,246 +1,86 @@
 # Screenshot Guide for Chrome Web Store
 
-## Overview
+Last updated: 2026-03-25
 
-You need **4 screenshots** that tell the story of using Mirlo. Chrome Web Store requires at least 1, but 3-5 is recommended.
+## Current Screenshot Set (4 images, 1280x800)
 
-**Recommended size**: 1280x800px (or 640x400px)
+1. **Hero** — Bird + "Learn a language while you browse / Without sharing your browsing history"
+2. **Product** — Real NYT article with translated words and tooltip visible, floating on teal
+3. **Density comparison** — Same article at Low vs High density, side by side
+4. **Setup** — Options page floating on teal, "Install. Pick your languages. Start reading."
 
----
+Plus two promotional tiles:
+- **Marquee** (1400x560) — Bird + headline, same visual language as hero
+- **Small promo** (440x280) — Bird + "Mirlo" + tagline
 
-## The 4-Step Story
+## How We Build Screenshots
 
-### Screenshot 1: Enable Mirlo
-**What to show**: Activation toast appearing on a real Spanish website
+### The workflow: you capture, Remotion frames
 
-**How to capture**:
-1. Load extension (unpacked) in Chrome
-2. Visit a Spanish news site you've never enabled Mirlo on:
-   - El País: https://elpais.com
-   - BBC Mundo: https://www.bbc.com/mundo
-   - Wikipedia ES: https://es.wikipedia.org
-3. Wait for activation toast to appear
-4. Take screenshot (Cmd+Shift+4 or DevTools)
+1. **Take clean browser screenshots** — no annotations, no circles, no zoom callouts. Just the browser as it looks with Mirlo active.
+2. **Drop them in** `~/dev/mandalivia/remotion/public/mirlo/`
+3. **Remotion compositions** in `~/dev/mandalivia/remotion/src/mirlo-store-v2/` handle the visual framing: teal gradient background, white header text, drop shadow on the screenshot, any zoom callouts.
+4. **Render** with `npx remotion still <CompositionId> --output path/to/file.png`
+5. **Copy finals** to `marketing/screenshots/en/`
 
-**Key elements**:
-- Real website content visible
-- Activation toast clearly shown
-- "Enable Mirlo on this site?" message visible
+This separation works well. You control the content (what article, what state, what's visible). Remotion controls the presentation (consistent teal gradient, typography, layout). Changing the message text doesn't require new screenshots, and new screenshots don't require redesigning the frame.
 
----
+### Remotion project structure
 
-### Screenshot 2: Choose Language
-**What to show**: Options page with language selection
-
-**How to capture**:
-1. Right-click extension icon → Options
-2. Options page opens in new tab
-3. Make sure dropdowns show: English → Spanish (or your preferred pair)
-4. Capture the full options page
-
-**Key elements**:
-- Both language dropdowns visible
-- Clean, professional look
-- Mirlo hero banner at top
-- "Save Settings" button visible
-
----
-
-### Screenshot 3: Translate Paragraph
-**What to show**: Main feature in action—translated paragraph with tooltip
-
-**How to capture**:
-1. On an enabled Spanish website, click a paragraph
-2. Mirlo tooltip appears with English translation
-3. Capture while tooltip is visible
-4. Make sure selected paragraph is highlighted
-
-**Key elements**:
-- Spanish article clearly visible
-- Paragraph highlighted/selected
-- Mirlo tooltip showing English translation
-- Real article (not test content)
-
-**Pro tip**: Use a well-known publication like El País for credibility
-
----
-
-### Screenshot 4: Toggle Back
-**What to show**: Clicking again to see original (toggle feature)
-
-**How to capture**:
-1. On a translated paragraph, click it again
-2. Tooltip shows "Switch to Spanish" button
-3. Capture this state
-
-**Key elements**:
-- Same article as Screenshot 3 (shows continuity)
-- Tooltip with "Switch to Spanish" button
-- Demonstrates the toggle/test-yourself feature
-
----
-
-## Two Approaches
-
-### Approach A: Clean & Simple (Easier)
-Just take clean screenshots at 1280x800px of each step. No frames, no annotations.
-
-**Pros**:
-- Quick to create
-- Chrome Web Store accepts these
-- Still tells the story
-
-**Cons**:
-- Less polished
-- Users might miss key details
-
----
-
-### Approach B: Framed & Annotated (Professional)
-Use the `screenshot-frame.html` template to add:
-- Step numbers and titles
-- Callout arrows pointing to features
-- Captions explaining what's happening
-
-**Pros**:
-- Very professional
-- Guides viewer's eye
-- Explains features clearly
-
-**Cons**:
-- Requires more setup
-- Need to edit HTML and compose images
-
----
-
-## Recommended Workflow
-
-### Step 1: Capture Raw Screenshots
-Take 4 clean screenshots of the extension in action:
-
-```bash
-marketing/screenshots/raw/
-├── raw-01-activation.png    # Activation toast
-├── raw-02-options.png        # Options page
-├── raw-03-translate.png      # Translation in action
-└── raw-04-toggle.png         # Toggle feature
+```
+~/dev/mandalivia/remotion/
+  src/mirlo-store-v2/
+    HeroScreenshot.tsx    — Screenshot 1: bird + headline (no browser screenshot)
+    Screen2_WordsTranslate.tsx — Screenshot 2: article with translations
+    Screen4_DensityControl.tsx — Screenshot 3: low vs high density side-by-side
+    Screen5_Setup.tsx     — Screenshot 4: options page
+    MarqueeTile.tsx       — 1400x560 marquee banner
+    PromoTile.tsx         — 440x280 small promo tile
+    shared.tsx            — Reusable components (ScreenFrame, FloatingScreenshot, ZoomCallout)
+  src/mirlo-store/
+    Composition.tsx       — v1 screenshots (archived, not used)
+  public/mirlo/
+    mirlo-circle.png      — Bird in circular frame (used in hero, marquee, promo)
+    screen2.png           — NYT article with tooltip visible
+    lowdensity.png        — Same article at Low density
+    highdensity.png       — Same article at High density
+    options-page.png      — Settings page
 ```
 
-### Step 2: Choose Your Approach
+### Render commands
 
-**Option A**: Submit raw screenshots as-is (rename and upload)
-
-**Option B**: Use `screenshot-frame.html` to frame them:
-1. Edit HTML to replace placeholder `<div>` with `<img src="raw/raw-01-activation.png">`
-2. Adjust callout positions
-3. Use DevTools to capture each framed screenshot
-4. Save as final screenshots
-
-### Step 3: Final Files
 ```bash
-marketing/screenshots/
-├── 01-enable-mirlo.png       # 1280x800px
-├── 02-choose-language.png    # 1280x800px
-├── 03-translate.png          # 1280x800px
-└── 04-toggle.png             # 1280x800px
+cd ~/dev/mandalivia/remotion
+
+# Individual
+npx remotion still MirloHero --output /tmp/hero.png
+npx remotion still MirloWordsTranslate --output /tmp/words.png
+npx remotion still MirloDensityControl --output /tmp/density.png
+npx remotion still MirloSetup --output /tmp/setup.png
+npx remotion still MirloMarquee --output /tmp/marquee.png
+npx remotion still MirloPromo --output /tmp/promo.png
+
+# Preview in browser
+npx remotion studio
 ```
 
----
+### When to re-render
 
-## Recommended Sites for Screenshots
+- **Message text changes** — edit the TSX composition, re-render. No new screenshots needed.
+- **New feature to show** — capture a new browser screenshot, drop it in `public/mirlo/`, wire it into a composition.
+- **New screenshot slot** — create a new composition in `mirlo-store-v2/`, register it in `Root.tsx` as a `<Still>`.
 
-### Spanish
-- **El País** (https://elpais.com) - Premium journalism, recognizable
-- **BBC Mundo** (https://www.bbc.com/mundo) - Trusted news
-- **Wikipedia ES** (https://es.wikipedia.org) - Everyone knows it
+## What Makes a Good Raw Screenshot
 
-### French
-- **Le Monde** (https://www.lemonde.fr)
-- **Wikipedia FR** (https://fr.wikipedia.org)
+- **Real content** on a real site. NYT, El País, BBC Mundo, Wikipedia — recognizable publications add credibility.
+- **Translated words clearly visible** — enough teal text that the effect is obvious even at thumbnail size.
+- **Same article and scroll position** for comparison shots (density low vs high).
+- **Clean browser chrome** — no other extensions visible, no dev tools, no personal tabs.
+- **No annotations** — Remotion handles all framing, callouts, and text overlays.
 
-### German
-- **Der Spiegel** (https://www.spiegel.de)
-- **Wikipedia DE** (https://de.wikipedia.org)
+## CWS Technical Requirements
 
-**Why these?**: Recognizable brands add credibility. Users see "Oh, it works on El País!" and trust it.
-
----
-
-## Screenshot Best Practices
-
-### ✅ DO:
-- Use real, interesting content (actual news articles)
-- Keep browser at 100% zoom
-- Close unnecessary tabs/windows
-- Use well-known websites (El País, Wikipedia, BBC)
-- Show the full feature workflow
-- Keep UI clean and professional
-
-### ❌ DON'T:
-- Use Lorem Ipsum or test content
-- Show developer tools or console errors
-- Include personal information in visible tabs
-- Use broken or half-loaded pages
-- Show the extension on inappropriate sites
-- Include other extensions' icons (clean toolbar)
-
----
-
-## Technical Details
-
-### Accepted Formats
-- PNG (recommended)
-- JPEG
-
-### Accepted Sizes
-- **Recommended**: 1280x800px (16:10 ratio)
-- **Alternative**: 640x400px (same ratio)
-- **Max file size**: 16MB per image
-
-### How Many?
-- **Minimum**: 1 screenshot
-- **Recommended**: 3-5 screenshots
-- **Maximum**: 5 screenshots
-
----
-
-## Quick Start (Minimal Effort)
-
-If you want to get screenshots done quickly:
-
-1. **Take 3 simple screenshots** (skip the framing):
-   - Options page (full page)
-   - Translation in action (article + tooltip)
-   - Toggle feature (tooltip with "Switch to Spanish")
-
-2. **Resize to 1280x800px** if needed
-
-3. **Upload to Chrome Web Store**
-
-This is totally acceptable and many extensions do this. The framed approach is just extra polish.
-
----
-
-## Tools You Can Use
-
-### Built-in
-- **Chrome DevTools**: Right-click → Inspect → Capture node screenshot
-- **macOS Screenshot**: Cmd+Shift+4 (drag to select area)
-
-### Optional (for framing/editing)
-- **Figma** (free): Design frames and annotations
-- **Canva** (free): Add text and arrows
-- **Preview** (macOS): Basic cropping and resizing
-- **Photoshop/Sketch**: Full control
-
----
-
-## Need Help?
-
-Once you have raw screenshots, I can:
-- Help you frame them using the HTML template
-- Adjust callout positions
-- Suggest which screenshots work best
-- Help you compose the final images
-
-Just let me know!
+- **Screenshots:** 1280x800 or 640x400, PNG or JPEG, max 16MB each, up to 5
+- **Small promo tile:** 440x280
+- **Marquee:** 1400x560
+- **All images:** Full bleed, square corners, no padding

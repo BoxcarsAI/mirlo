@@ -1,16 +1,18 @@
 # Mirlo Marketing Guide
 
-Last updated: 2026-03-24
+Last updated: 2026-03-25
+
+## Store Title
+
+**Mirlo — Language Learning Without the Tracking**
 
 ## The Story
 
-Learning a language while you browse the web is a great idea. Extensions like Toucan proved it — 750,000 people use Toucan to see translated words sprinkled through their normal reading. The concept works.
+Bundle learning a language into something you already do — browsing the web. That's the pitch, and it works. Toucan proved it with 750,000 users.
 
-But every tool that does this has the same structural problem. Word-level translation requires a translation engine, and until recently, that meant a server. Your text goes up, the translation comes back. That server is why you need an account. It's why there's a privacy policy with 47 bullet points. It's why the business model eventually turns toward tracking, upsells, or both — someone has to pay for that infrastructure.
+But every tool that does this sends what you're reading to the cloud. Your text goes up, the translation comes back, and along the way you've shared what you read, when, and where with a company that could sell or lose that data.
 
-Chrome's Translator API changes this. Translation now happens on your device, inside the browser, with no network request. No server means no account, no data collection, no privacy policy theater. The privacy isn't a promise Mirlo makes — it's a consequence of the architecture. There is nothing to send and nowhere to send it.
-
-Mirlo is the first word-level contextual translation tool built on Chrome's on-device Translator API.
+In 2026, Chrome built an AI Translator API right into the browser. Mirlo is built on it. Translation happens on your device, and nothing leaves your computer. This isn't a privacy policy — it's the architecture.
 
 ---
 
@@ -84,15 +86,14 @@ See [competitive.md](competitive.md) for detailed analysis. The short version:
 
 ## Messaging
 
-### The "Until Now" Narrative
+### The Story Arc
 
-This is the core story structure. Use it in long-form contexts (store description, README, blog posts, launch posts):
+The store copy, README, and any long-form content follow this structure:
 
-1. **Acknowledge the category.** Word-level translation while browsing is a proven, useful idea.
-2. **Name the structural problem.** Every tool that does this sends your text to a server. That's why they need accounts and collect data.
-3. **Explain what changed.** Chrome now ships a Translator API that runs on-device.
-4. **Land the consequence.** No server means no account, no tracking, no compromise. Privacy by architecture.
-5. **Introduce Mirlo.** The first tool built on this foundation.
+1. **Start with the aspiration.** Learning a language while you browse is a great idea — bundle it into something you already do.
+2. **Name the catch.** Every tool that does this sends your reading to the cloud. That's how you end up with accounts, tracking, and privacy policies.
+3. **Explain what changed.** Chrome built an on-device Translator API. No server needed.
+4. **Land it.** This isn't a privacy policy — it's the architecture. No servers. No accounts. No tracking.
 
 ### Key Messages
 
