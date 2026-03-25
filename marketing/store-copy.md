@@ -1,56 +1,74 @@
-# Chrome Web Store Description (English)
+# Chrome Web Store Listing
 
-## Summary (132 chars max)
-Privacy-first language learning for intermediate learners. Read real content with instant, local translations. No tracking.
+## Summary (132 chars max — keep under 85 for full visibility)
+
+Learn a language while you browse. Words translate inline, on your device. No accounts, no tracking.
+
+(84 chars)
 
 ## Detailed Description
 
-You've finished the beginner apps. You can handle basic conversations. But when you try to read real articles in your target language, you're lost.
+(Plain text only — no HTML, no markdown. Line breaks via Enter. Unicode bullets OK.)
 
-Mirlo helps you bridge that gap. Read real content. Click any paragraph for instant translation. Build fluency through authentic reading—no tracking, no games, no upsells.
+Bundle learning a language into something you already do — browsing the web. Mirlo swaps words on the page with ones from the language you're trying to learn, so you pick them up while you read.
 
-✨ What Makes Mirlo Different
+Every tool that does this has to send what you're reading to the cloud. That's how translation worked — your text goes up, the translation comes back, and along the way you've shared what you read, when, and where with a company that could sell or lose that data.
 
-• Built for intermediate learners
-  Skip the beginner lessons you've outgrown. Read real news, blogs, and social media in your target language.
+In 2026, Chrome built an AI Translator API right into the browser. Mirlo is built on it. Translation happens on your device, and nothing leaves your computer. This isn't a privacy policy — it's the architecture. No servers. No accounts. No tracking. 
 
-• Translate entire paragraphs
-  Understand full context, not just individual words. Click any paragraph for instant translation.
+HOW IT WORKS
 
-• 100% private, 100% local
-  All translations happen on your device using Chrome's built-in AI. Zero tracking. Zero data collection. Your reading is private.
+Mirlo replaces individual words on web pages with translations in your target language. They appear inline as you read — colored text with a dotted underline. Hover any translated word to see the original. 
 
-• Actually free forever
-  No premium plans. No upgrade prompts. No subscriptions. Open source on GitHub—verify it yourself.
+You control the intensity with a density setting:
 
-• Fast local translations
-  Instant results powered by Chrome's local AI. No waiting for API calls.
+  · Low — about 1 in 12 words, gentle exposure
+  · Medium — about 1 in 4 words, steady learning
+  · High — about 1 in 2 words, immersive reading
 
-🎯 Perfect For
+Want full context? Click the bird badge on any paragraph to translate the whole thing. Click again to switch back.
 
-- Intermediate language learners (B1-B2) ready for real content
-- People maintaining or improving their language skills through reading
-- Privacy-conscious learners tired of being tracked
-- Anyone frustrated with beginner-focused apps
+SUPPORTED LANGUAGES: English, Spanish, French, German
 
-📚 How It Works
 
-1. Enable Mirlo on websites you want to read
-2. Choose your language pair in settings (English, Spanish, French, or German)
-3. Click any paragraph to see the translation
-4. Switch back and forth to test your understanding
-5. Build real fluency by reading authentic content
+## Store Privacy Tab
 
-🔒 Privacy Promise
+All translation happens on your device using Chrome's Translator API. No servers, no accounts, no data collection.
 
-Mirlo uses Chrome's built-in translation API—everything happens on your device. No external servers. No data collection. No tracking your reading habits.
+activeTab
+Required to access the page you're reading so Mirlo can translate words on it. No background access.
 
-Open source code available on GitHub.
+scripting
+Required to change translated words and hover tooltips into the page.
 
-🌍 Supported Languages
+storage
+Required to remember your language preferences locally. No cloud storage, no accounts.
 
-- English ↔ Spanish
-- English ↔ French
-- English ↔ German
+host
+Mirlo works on any website you choose to read. Host access lets the content script run on whatever site you visit. No tracking or data collection.
 
-Starting with languages that work reliably with Chrome's local translation API. More languages coming based on user feedback.
+https://www.boxcars.ai/mirlo-privacy-policy/
+
+
+## Manifest Summary (132 char limit — used in extension popup and install prompt)
+
+Learn a language while you browse. Words translate inline, on your device. No accounts, no tracking.
+
+
+## Notes for Screenshot Updates
+
+The description does the "until now" narrative work, but screenshots are where 80% of the conversion happens. Current screenshots should show:
+
+1. A real article with translated words visible inline (teal text, dotted underline)
+2. A hover tooltip showing original word
+3. The density control in the options page (Low / Medium / High)
+4. The popup showing domain toggle and language pair
+5. Before/after — same paragraph with density on Low vs High
+
+Callout text on screenshots should reinforce the key messages:
+  - "Words translate as you read"
+  - "Hover to see the original"
+  - "You control how many words change"
+  - "Everything happens on your device"
+
+See marketing/SCREENSHOT-GUIDE.md for composition details.

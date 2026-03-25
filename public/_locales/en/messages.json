@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "Mirlo",
+    "message": "Mirlo — Language Learning Without the Tracking",
     "description": "The name of the extension"
   },
   "appDesc": {
-    "message": "Privacy-first language learning for intermediate learners. Read real content with instant, local translations. No tracking.",
+    "message": "Learn a language while you browse. Words translate inline, on your device. No accounts, no tracking.",
     "description": "The description of the extension shown in the store and extensions page"
   },
   "actionTitle": {
