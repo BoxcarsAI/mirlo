@@ -1,4 +1,4 @@
-const SKIP_SEGMENTATION = ".mirlo-badge, .mirlo-marker";
+const SKIP_SEGMENTATION = "a, .mirlo-badge, .mirlo-marker";
 
 export function isSegmented(paragraph: HTMLParagraphElement): boolean {
   return paragraph.querySelector(".mirlo-word") !== null;

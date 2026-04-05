@@ -76,24 +76,28 @@ describe("segmentParagraph", () => {
     expect(wordsInEm.length).toBeGreaterThan(0);
   });
 
-  it("preserves link elements and their href", () => {
+  it("skips words inside links", () => {
     const p = setup(WITH_LINK);
     segmentParagraph(p);
     const link = p.querySelector("a");
     expect(link).not.toBeNull();
     expect(link!.getAttribute("href")).toBe("/article");
     const wordsInLink = link!.querySelectorAll(".mirlo-word");
-    expect(wordsInLink.length).toBeGreaterThan(0);
+    expect(wordsInLink.length).toBe(0);
+    // Link text should remain untouched
+    expect(link!.textContent).toBe("full article about language learning");
   });
 
-  it("preserves deeply nested structure (bold inside link)", () => {
+  it("skips words inside links even with nested inline elements", () => {
     const p = setup(DEEPLY_NESTED);
     segmentParagraph(p);
     const link = p.querySelector("a");
-    const strong = link?.querySelector("strong");
-    expect(strong).not.toBeNull();
-    const wordsInStrong = strong!.querySelectorAll(".mirlo-word");
-    expect(wordsInStrong.length).toBeGreaterThan(0);
+    expect(link).not.toBeNull();
+    const wordsInLink = link!.querySelectorAll(".mirlo-word");
+    expect(wordsInLink.length).toBe(0);
+    // Words outside the link should still be segmented
+    const allWords = getWordSpans(p);
+    expect(allWords.length).toBeGreaterThan(0);
   });
 
   it("handles multiple inline elements", () => {
