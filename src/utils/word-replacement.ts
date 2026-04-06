@@ -55,7 +55,7 @@ const STOPWORDS = new Set([
   "another", "become", "became", "because", "cannot",
   // Gerunds the Translator API mistranslates as nouns when sent individually
   // e.g. "running"→"funcionamiento", "building"→"edificio"
-  // See: backlog/decisions/decision-1
+  // See: docs/decisions/decision-1
   "running", "eating", "thinking", "playing", "writing",
   "building", "learning", "reading", "speaking", "working",
 ]);
