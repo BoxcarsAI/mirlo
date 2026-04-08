@@ -48,3 +48,19 @@ export const REPEATED_WORDS =
 /** Paragraph with mix of simple and complex words */
 export const MIXED_COMPLEXITY =
   "<p>The extraordinary architecture of the ancient cathedral impressed all the international visitors who traveled there</p>";
+
+/** Proper noun mid-sentence (should be skipped) */
+export const PROPER_NOUN_MID_SENTENCE =
+  "<p>She met Maria at the coffee shop downtown yesterday</p>";
+
+/** Proper noun at sentence start (cannot distinguish from regular word) */
+export const PROPER_NOUN_SENTENCE_START =
+  "<p>Maria walked to the store and bought some bread</p>";
+
+/** Multiple proper nouns scattered through sentence */
+export const MULTIPLE_PROPER_NOUNS =
+  "<p>Yesterday John and Maria visited the Eiffel Tower in Paris</p>";
+
+/** Second sentence starts with proper noun */
+export const PROPER_NOUN_AFTER_PERIOD =
+  "<p>The weather was lovely. Maria walked to the store and picked some flowers.</p>";

@@ -40,6 +40,39 @@ export interface Translator {
 
 const WORD_PATTERN = /^[a-zA-ZÀ-ÿ]+$/;
 const MIN_WORD_LENGTH = 5;
+const UPPERCASE_START = /^[A-ZÀ-Ý]/;
+const SENTENCE_END = /[.?!]$/;
+
+/**
+ * A word is likely a proper noun if it starts with an uppercase letter
+ * and is not at the beginning of a sentence (first word in paragraph,
+ * or first word after sentence-ending punctuation).
+ */
+function isLikelyProperNoun(
+  span: HTMLSpanElement,
+  allSpans: NodeListOf<HTMLSpanElement>,
+): boolean {
+  const word = span.dataset.mirloOriginal;
+  if (!word || !UPPERCASE_START.test(word)) return false;
+
+  // Find this span's index in the list
+  let index = -1;
+  for (let i = 0; i < allSpans.length; i++) {
+    if (allSpans[i] === span) {
+      index = i;
+      break;
+    }
+  }
+
+  // First word in paragraph — treat as sentence start
+  if (index <= 0) return false;
+
+  // Check if the previous span's original text ends with sentence-ending punctuation
+  const prevWord = allSpans[index - 1].dataset.mirloOriginal ?? "";
+  if (SENTENCE_END.test(prevWord)) return false;
+
+  return true;
+}
 
 const STOPWORDS = new Set([
   // Articles & determiners
@@ -70,6 +103,7 @@ export function collectTranslatableWords(paragraph: HTMLParagraphElement): strin
     if (!WORD_PATTERN.test(word)) continue;
     if (word.length < MIN_WORD_LENGTH) continue;
     if (STOPWORDS.has(word.toLowerCase())) continue;
+    if (isLikelyProperNoun(span, spans)) continue;
     if (seen.has(word)) continue;
     seen.add(word);
     words.push(word);

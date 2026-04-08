@@ -6,6 +6,10 @@ import {
   WITH_PUNCTUATION,
   REPEATED_WORDS,
   MIXED_COMPLEXITY,
+  PROPER_NOUN_MID_SENTENCE,
+  PROPER_NOUN_SENTENCE_START,
+  MULTIPLE_PROPER_NOUNS,
+  PROPER_NOUN_AFTER_PERIOD,
 } from "./fixtures/paragraphs";
 import { segmentParagraph } from "@/utils/word-segmentation";
 import {
@@ -323,6 +327,57 @@ describe("collectTranslatableWords", () => {
     expect(words).not.toContain("who");
     expect(words).not.toContain("all");
     expect(words).not.toContain("there");
+  });
+});
+
+describe("proper noun filtering", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("excludes mid-sentence capitalized words as likely proper nouns", () => {
+    const p = setup(PROPER_NOUN_MID_SENTENCE);
+    const words = collectTranslatableWords(p);
+    expect(words).not.toContain("Maria");
+    // lowercase content words should still be collected
+    expect(words).toContain("coffee");
+    expect(words).toContain("downtown");
+    expect(words).toContain("yesterday");
+  });
+
+  it("includes capitalized words at paragraph start", () => {
+    const p = setup(PROPER_NOUN_SENTENCE_START);
+    const words = collectTranslatableWords(p);
+    // First word — can't tell if proper noun, so include it
+    expect(words).toContain("Maria");
+    expect(words).toContain("walked");
+    expect(words).toContain("store");
+    expect(words).toContain("bought");
+    expect(words).toContain("bread");
+  });
+
+  it("excludes multiple proper nouns in one paragraph", () => {
+    const p = setup(MULTIPLE_PROPER_NOUNS);
+    const words = collectTranslatableWords(p);
+    expect(words).not.toContain("John");
+    expect(words).not.toContain("Maria");
+    expect(words).not.toContain("Eiffel");
+    expect(words).not.toContain("Tower");
+    expect(words).not.toContain("Paris");
+    // regular words still collected
+    expect(words).toContain("Yesterday");
+    expect(words).toContain("visited");
+  });
+
+  it("treats word after sentence-ending punctuation as sentence start", () => {
+    const p = setup(PROPER_NOUN_AFTER_PERIOD);
+    const words = collectTranslatableWords(p);
+    // "Maria" follows ". " so it's a sentence start — include it
+    expect(words).toContain("Maria");
+    expect(words).toContain("weather");
+    expect(words).toContain("walked");
+    expect(words).toContain("store");
+    expect(words).toContain("picked");
   });
 });
 
