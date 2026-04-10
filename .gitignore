@@ -1,0 +1,16 @@
+node_modules/
+.output/
+.wxt/
+*.zip
+.DS_Store
+
+# Internal project files (managed in separate repo)
+.claude/
+ops/
+marketing/
+product/
+spikes/
+scripts/
+reports/
+mission.md
+pm.md

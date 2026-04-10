@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="manifest.open_in_tab" content="true" />
+    <title data-i18n="optionsTitle">Mirlo Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="options-header">
+      <div class="options-header-inner">
+        <img
+          class="options-hero-banner"
+          src="/assets/mirlo-hero-banner.png"
+          data-i18n-alt="optionsHeroAlt"
+        />
+        <div class="options-header-text">
+          <h1 class="options-title" data-i18n="optionsSettingsTitle">Mirlo Settings</h1>
+          <p class="options-subtitle" data-i18n="optionsSettingsSubtitle">Learn languages naturally</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="options-main">
+      <form class="options-card" data-i18n-aria-label="optionsAriaLabel">
+        <h2 class="options-section-title" data-i18n="optionsPreferencesTitle">Language Preferences</h2>
+
+        <div class="options-field">
+          <label class="options-label" for="native-language" data-i18n="optionsNativeLabel">
+            Native Language
+            <span class="options-label-hint" data-i18n="optionsNativeHint">The language you know best</span>
+          </label>
+          <select id="native-language" class="options-select"></select>
+        </div>
+
+        <div class="options-field">
+          <label class="options-label" for="learning-language" data-i18n="optionsLearningLabel">
+            Learning Language
+            <span class="options-label-hint" data-i18n="optionsLearningHint">The language you want to learn</span>
+          </label>
+          <select id="learning-language" class="options-select"></select>
+        </div>
+
+        <h2 class="options-section-title">Translation Density</h2>
+
+        <div class="options-field">
+          <label class="options-label" for="translation-density">
+            How many words to translate
+            <span class="options-label-hint">Controls the percentage of words replaced on each page</span>
+          </label>
+          <select id="translation-density" class="options-select">
+            <option value="low">Low (a few words)</option>
+            <option value="medium">Medium (some words)</option>
+            <option value="high">High (many words)</option>
+          </select>
+        </div>
+
+        <button type="button" id="save-button" class="options-save-button" data-i18n="optionsSaveBtn">
+          Save Settings
+        </button>
+
+        <div id="save-status" class="options-status" role="status" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
