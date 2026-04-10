@@ -2,7 +2,11 @@
 
 **Learn a language while you browse. Everything happens on your device.**
 
-Mirlo is a Chrome extension that replaces words on web pages with translations in your target language. You read normally and pick up words as you go. Hover any translated word to see the original.
+<p align="center">
+  <img src="docs/images/hero.png" alt="Mirlo — Learn a language while you browse, without sharing your browsing history" width="720">
+</p>
+
+Mirlo is a Chrome extension that replaces words on web pages with translations in the language you're trying to learn. You read normally and pick up words as you go. Hover any translated word to see the original.
 
 All translation runs locally using Chrome's built-in Translator API. No servers, no accounts, no data collection.
 
@@ -12,9 +16,17 @@ All translation runs locally using Chrome's built-in Translator API. No servers,
 
 ## How It Works
 
-When Mirlo is active on a page, it scans for readable paragraphs, picks individual words based on your density setting, and replaces them with translations in your target language. The translated words appear inline — colored text with a dotted underline. Hover one to see the original.
+When Mirlo is active on a page, it scans for readable paragraphs, picks individual words based on your density setting, and replaces them with translations in the language you're learning. The translated words appear inline — colored text with a dotted underline. Hover one to see the original.
+
+<p align="center">
+  <img src="docs/images/inline-translation.png" alt="Mirlo translating words inline on a news article" width="720">
+</p>
 
 The density control sets the intensity: Low replaces about 1 in 12 words (gentle exposure), Medium about 1 in 4 (default), High about 1 in 2 (immersive). For full paragraph context, click the bird badge that appears when you hover over a paragraph.
+
+<p align="center">
+  <img src="docs/images/density-control.png" alt="Density control — Low for gentle exposure, High for immersive reading" width="720">
+</p>
 
 Language detection runs per-paragraph, so mixed-language pages translate correctly in each direction.
 
