@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "Mirlo",
+    "message": "Mirlo — Aprende idiomas sin rastreo",
     "description": "The name of the extension"
   },
   "appDesc": {
-    "message": "Aprendizaje de idiomas priorizando la privacidad para estudiantes intermedios. Lee contenido real con traducciones instantáneas y locales. Sin rastreo.",
+    "message": "Aprende un idioma mientras navegas. Las palabras se traducen dentro de la página, en tu dispositivo. Sin cuentas, sin rastreo.",
     "description": "The description of the extension shown in the store and extensions page"
   },
   "actionTitle": {

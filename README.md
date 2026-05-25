@@ -22,10 +22,10 @@ When Mirlo is active on a page, it scans for readable paragraphs, picks individu
   <img src="docs/images/inline-translation.png" alt="Mirlo translating words inline on a news article" width="720">
 </p>
 
-The density control sets the intensity: Low replaces about 1 in 12 words (gentle exposure), Medium about 1 in 4 (default), High about 1 in 2 (immersive). For full paragraph context, click the bird badge that appears when you hover over a paragraph.
+The density control sets the intensity: Low replaces about 1 in 12 words (gentle exposure), Medium about 1 in 4 (default), High about 1 in 2 (heavy exposure). For full paragraph context, click the bird badge that appears when you hover over a paragraph.
 
 <p align="center">
-  <img src="docs/images/density-control.png" alt="Density control — Low for gentle exposure, High for immersive reading" width="720">
+  <img src="docs/images/density-control.png" alt="Density control — Low for gentle exposure, High for heavy exposure" width="720">
 </p>
 
 Language detection runs per-paragraph, so mixed-language pages translate correctly in each direction.
