@@ -1,10 +1,22 @@
 import { localizeHtmlPage } from "@/utils/i18n";
 import { STORAGE_KEYS } from "@/utils/storage-keys";
+import {
+  SUPPORTED_LANGUAGES,
+  getLanguageLabel,
+  isSupportedLanguage,
+  validateLanguagePair,
+} from "@/utils/languages";
 
 localizeHtmlPage();
 
-const DEFAULT_NATIVE = "en";
-const DEFAULT_LEARNING = "es";
+// Native defaults to the browser UI language when supported, else English.
+function defaultNativeLanguage(): string {
+  const ui = chrome.i18n.getUILanguage()?.split("-")[0]?.toLowerCase();
+  return ui && isSupportedLanguage(ui) ? ui : "en";
+}
+
+const DEFAULT_NATIVE = defaultNativeLanguage();
+const DEFAULT_LEARNING = DEFAULT_NATIVE === "es" ? "en" : "es";
 
 const nativeSelect = document.getElementById("native-language") as HTMLSelectElement;
 const learningSelect = document.getElementById("learning-language") as HTMLSelectElement;
@@ -69,28 +81,22 @@ function validateLanguages(
   native: string,
   learning: string,
 ): { valid: boolean; message?: string } {
-  if (native === learning) {
-    return {
-      valid: false,
-      message: chrome.i18n.getMessage("optionsErrorSameLang"),
-    };
-  }
-  return { valid: true };
+  const result = validateLanguagePair(native, learning);
+  if (result.valid) return { valid: true };
+  const key = result.reason === "same" ? "optionsErrorSameLang" : "optionsErrorUnsupportedLang";
+  return { valid: false, message: chrome.i18n.getMessage(key) };
 }
 
 function populateLanguageSelects(): void {
-  const languages = [
-    { code: "en", name: chrome.i18n.getMessage("langEnFull") },
-    { code: "es", name: chrome.i18n.getMessage("langEsFull") },
-    { code: "fr", name: chrome.i18n.getMessage("langFrFull") },
-    { code: "de", name: chrome.i18n.getMessage("langDeFull") },
-  ];
+  const languages = [...SUPPORTED_LANGUAGES].sort((a, b) =>
+    a.english.localeCompare(b.english),
+  );
 
   [nativeSelect, learningSelect].forEach((select) => {
     languages.forEach((lang) => {
       const option = document.createElement("option");
       option.value = lang.code;
-      option.textContent = lang.name;
+      option.textContent = getLanguageLabel(lang.code);
       select.appendChild(option);
     });
   });

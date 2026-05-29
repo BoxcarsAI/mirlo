@@ -115,6 +115,12 @@ describe("getLanguagePairForPage", () => {
     const pair = getLanguagePairForPage("fr", "de");
     expect(pair).toEqual({ sourceLanguage: "fr", targetLanguage: "de" });
   });
+
+  it("returns null when native and learning are the same language", () => {
+    document.documentElement.lang = "en";
+    const pair = getLanguagePairForPage("en", "en");
+    expect(pair).toBeNull();
+  });
 });
 
 function fakeDetector(lang: string, confidence = 0.95): LanguageDetector {
@@ -183,6 +189,16 @@ describe("getLanguagePairForText", () => {
       "hi",
       "en",
       "es",
+      fakeDetector("en"),
+    );
+    expect(pair).toBeNull();
+  });
+
+  it("returns null when native and learning are the same language", async () => {
+    const pair = await getLanguagePairForText(
+      "The quick brown fox jumps over",
+      "en",
+      "en",
       fakeDetector("en"),
     );
     expect(pair).toBeNull();

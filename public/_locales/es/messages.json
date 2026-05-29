@@ -173,22 +173,6 @@
     "message": "El idioma nativo y el de aprendizaje deben ser diferentes.",
     "description": "Error when native and learning languages are the same"
   },
-  "langEnFull": {
-    "message": "🇬🇧 Inglés",
-    "description": "English with flag"
-  },
-  "langEsFull": {
-    "message": "🇪🇸 Español",
-    "description": "Spanish with flag"
-  },
-  "langFrFull": {
-    "message": "🇫🇷 Francés",
-    "description": "French with flag"
-  },
-  "langDeFull": {
-    "message": "🇩🇪 Alemán",
-    "description": "German with flag"
-  },
   "contentBadgeTitle": {
     "message": "Traducir con Mirlo",
     "description": "Tooltip/Aria label for the translation badge"
@@ -218,5 +202,13 @@
   "contentNotNow": {
     "message": "Ahora no",
     "description": "Button to dismiss enable toast"
+  },
+  "optionsErrorUnsupportedLang": {
+    "message": "Ese par de idiomas no es compatible.",
+    "description": "Error when a selected language pair is not supported"
+  },
+  "optionsLanguagesPoweredBy": {
+    "message": "Idiomas proporcionados por la traducción integrada y local de Chrome.",
+    "description": "Caption crediting Chrome built-in translation for the language list"
   }
 }

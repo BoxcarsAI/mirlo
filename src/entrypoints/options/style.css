@@ -117,6 +117,12 @@ body {
   color: var(--mirlo-slate-400);
 }
 
+.options-powered-by {
+  margin: -4px 0 4px;
+  font-size: 12px;
+  color: var(--mirlo-slate-400);
+}
+
 .options-select {
   height: 48px;
   border-radius: 12px;

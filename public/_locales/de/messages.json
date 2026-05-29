@@ -173,22 +173,6 @@
     "message": "Mutter- und Lernsprache müssen unterschiedlich sein.",
     "description": "Error when native and learning languages are the same"
   },
-  "langEnFull": {
-    "message": "🇬🇧 Englisch",
-    "description": "English with flag"
-  },
-  "langEsFull": {
-    "message": "🇪🇸 Spanisch",
-    "description": "Spanish with flag"
-  },
-  "langFrFull": {
-    "message": "🇫🇷 Französisch",
-    "description": "French with flag"
-  },
-  "langDeFull": {
-    "message": "🇩🇪 Deutsch",
-    "description": "German with flag"
-  },
   "contentBadgeTitle": {
     "message": "Mit Mirlo übersetzen",
     "description": "Tooltip/Aria label for the translation badge"
@@ -218,5 +202,13 @@
   "contentNotNow": {
     "message": "Nicht jetzt",
     "description": "Button to dismiss enable toast"
+  },
+  "optionsErrorUnsupportedLang": {
+    "message": "Dieses Sprachpaar wird nicht unterstützt.",
+    "description": "Error when a selected language pair is not supported"
+  },
+  "optionsLanguagesPoweredBy": {
+    "message": "Sprachen bereitgestellt durch die in Chrome integrierte, lokale Übersetzung.",
+    "description": "Caption crediting Chrome built-in translation for the language list"
   }
 }

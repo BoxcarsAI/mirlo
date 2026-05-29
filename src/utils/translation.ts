@@ -22,6 +22,7 @@ export function getLanguagePairForPage(
   userNativeLanguage: string,
   userLearningLanguage: string,
 ): LanguagePair | null {
+  if (userNativeLanguage === userLearningLanguage) return null;
   const pageLanguage = getNormalizedPageLanguage();
   if (!pageLanguage) return null;
   if (pageLanguage === userNativeLanguage) {
@@ -46,6 +47,7 @@ export async function getLanguagePairForText(
   userLearningLanguage: string,
   detector: LanguageDetector,
 ): Promise<LanguagePair | null> {
+  if (userNativeLanguage === userLearningLanguage) return null;
   if (!text || text.length < MIN_DETECT_TEXT_LENGTH) return null;
 
   let results: { detectedLanguage: string; confidence: number }[];
