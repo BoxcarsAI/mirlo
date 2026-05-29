@@ -202,5 +202,9 @@
   "popupLearningLabel": {
     "message": "Aprendiendo",
     "description": "Label before the learning-language badge in the popup"
+  },
+  "popupTranslationPrefix": {
+    "message": "Traductor",
+    "description": "Prefix before the Translator availability status"
   }
 }

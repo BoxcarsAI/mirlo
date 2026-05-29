@@ -20,6 +20,7 @@ let currentTabId: number | null = null;
 interface LanguageInfo {
   htmlLang?: string;
   translationSupported?: boolean;
+  translationAvailability?: string;
   detectorSupported?: boolean;
   detectorAvailability?: string;
   detectorResult?: { detectedLanguage: string; confidence: number } | null;
@@ -55,9 +56,9 @@ function formatAiStatus(info: LanguageInfo | null): string {
   const detector = info.detectorSupported
     ? `${detectorPrefix} ${info.detectorAvailability}`
     : chrome.i18n.getMessage("popupDetectorUnsupported");
-  const translation = info.translationSupported
-    ? chrome.i18n.getMessage("popupTranslationSupported")
-    : chrome.i18n.getMessage("popupTranslationUnsupported");
+  const translation = !info.translationSupported
+    ? chrome.i18n.getMessage("popupTranslationUnsupported")
+    : `${chrome.i18n.getMessage("popupTranslationPrefix")} ${info.translationAvailability ?? "unknown"}`;
   return `${detector}; ${translation}`;
 }
 

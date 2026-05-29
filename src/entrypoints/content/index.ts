@@ -52,6 +52,7 @@ async function getDetector(): Promise<LanguageDetector | null> {
 interface LanguageInfo {
   htmlLang: string;
   translationSupported: boolean;
+  translationAvailability: string;
   detectorSupported: boolean;
   detectorAvailability: string;
   detectorResult: { detectedLanguage: string; confidence: number } | null;
@@ -95,7 +96,7 @@ function collectSampleText(limit = 2000): string {
 
 async function getPageLanguageInfo(): Promise<LanguageInfo> {
   const htmlLang = getHtmlLanguage();
-  const translationSupported = typeof (window as any).translation !== "undefined";
+  const translationSupported = "Translator" in self;
   const detectorSupported = "LanguageDetector" in self;
   const userActivation = {
     isActive: Boolean((document as any).userActivation?.isActive),
@@ -133,9 +134,31 @@ async function getPageLanguageInfo(): Promise<LanguageInfo> {
     }
   }
 
+  // Report the real Translator availability for the pair this page would use:
+  // detected (or declared) source language → the language being learned.
+  let translationAvailability = translationSupported ? "unknown" : "unsupported";
+  if (translationSupported) {
+    const sourceLanguage = detectorResult?.detectedLanguage || getNormalizedPageLanguage();
+    if (!sourceLanguage) {
+      translationAvailability = "no-source-language";
+    } else if (sourceLanguage === userTargetLanguage) {
+      translationAvailability = "already-target";
+    } else {
+      try {
+        translationAvailability = await (self as any).Translator.availability({
+          sourceLanguage,
+          targetLanguage: userTargetLanguage,
+        });
+      } catch (error: any) {
+        translationAvailability = error?.name || "availability-error";
+      }
+    }
+  }
+
   return {
     htmlLang,
     translationSupported,
+    translationAvailability,
     detectorSupported,
     detectorAvailability,
     detectorResult,
