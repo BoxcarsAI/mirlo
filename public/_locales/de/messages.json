@@ -206,5 +206,31 @@
   "popupTranslationPrefix": {
     "message": "Übersetzer",
     "description": "Prefix before the Translator availability status"
+  },
+  "contentDownloadModelTitle": {
+    "message": "Lade en_US.UTF-8$ herunter, um diese Seite zu übersetzen (einmalig).",
+    "description": "Toast title offering a one-time model download",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentDownloadModel": {
+    "message": "Herunterladen",
+    "description": "Button to start the model download"
+  },
+  "contentDownloading": {
+    "message": "Wird geladen… $",
+    "description": "Download progress button label",
+    "placeholders": {
+      "pct": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentDownloadFailed": {
+    "message": "Download fehlgeschlagen – zum Wiederholen tippen",
+    "description": "Button label when the download failed"
   }
 }

@@ -30,6 +30,7 @@ let mirloActive = false;
 let listenersBound = false;
 let activationToastEl: HTMLDivElement | null = null;
 let activationDismissTimer: ReturnType<typeof setTimeout> | null = null;
+let modelDownloadToastEl: HTMLDivElement | null = null;
 import { type TranslationDensity, DEFAULT_DENSITY } from "@/utils/storage-keys";
 let userTranslationDensity: TranslationDensity = DEFAULT_DENSITY;
 let userTargetLanguage = "es";
@@ -289,6 +290,15 @@ async function getOrCreateTranslator(
 
 async function translateWordsOnPage(): Promise<void> {
   if (!("Translator" in self)) return;
+
+  // A not-yet-downloaded model can only be fetched under a user gesture, which
+  // the automatic page-load path doesn't have. If the page's pair needs a
+  // download, prompt for it instead of silently failing.
+  const pending = await getPagePairAvailability();
+  if (pending && (pending.availability === "downloadable" || pending.availability === "downloading")) {
+    showModelDownloadToast(pending.source);
+    return;
+  }
 
   const detector = await getDetector();
   const translatorCache = new Map<string, any>();
@@ -718,6 +728,101 @@ function showActivationToast(domain: string): void {
   activationDismissTimer = setTimeout(() => {
     dismissToast();
   }, TOAST_AUTO_DISMISS_MS);
+}
+
+/**
+ * Determines the source→target pair this page would use and asks Chrome whether
+ * its on-device model is ready. Source is the detected page language (falling
+ * back to the declared lang). Returns null when there is nothing to translate.
+ */
+async function getPagePairAvailability(): Promise<{ source: string; availability: string } | null> {
+  if (!("Translator" in self)) return null;
+  let source = getNormalizedPageLanguage();
+  const detector = await getDetector();
+  if (detector) {
+    const sample = collectSampleText();
+    if (sample.length >= 20) {
+      try {
+        const results = await detector.detect(sample);
+        if (results?.[0] && results[0].confidence >= 0.5) {
+          source = results[0].detectedLanguage;
+        }
+      } catch {
+        // fall back to declared page language
+      }
+    }
+  }
+  if (!source || source === userTargetLanguage) return null;
+  try {
+    const availability = await (self as any).Translator.availability({
+      sourceLanguage: source,
+      targetLanguage: userTargetLanguage,
+    });
+    return { source, availability };
+  } catch {
+    return null;
+  }
+}
+
+function removeModelDownloadToast(): void {
+  if (!modelDownloadToastEl) return;
+  modelDownloadToastEl.classList.remove("is-visible");
+  modelDownloadToastEl.classList.add("is-hiding");
+  const el = modelDownloadToastEl;
+  modelDownloadToastEl = null;
+  setTimeout(() => el.remove(), 200);
+}
+
+function showModelDownloadToast(source: string): void {
+  if (modelDownloadToastEl) return;
+  const langName = getLanguageName(userTargetLanguage);
+  modelDownloadToastEl = document.createElement("div");
+  modelDownloadToastEl.className = "mirlo-toast";
+  modelDownloadToastEl.innerHTML = `
+    <div class="mirlo-toast-icon">⬇️</div>
+    <div class="mirlo-toast-content">
+      <div class="mirlo-toast-title"></div>
+      <div class="mirlo-toast-actions">
+        <button class="mirlo-toast-button is-primary" type="button"></button>
+        <button class="mirlo-toast-button" type="button"></button>
+      </div>
+    </div>
+  `;
+
+  const titleEl = modelDownloadToastEl.querySelector(".mirlo-toast-title")!;
+  titleEl.textContent = chrome.i18n.getMessage("contentDownloadModelTitle", [langName]);
+
+  const [downloadButton, dismissButton] =
+    modelDownloadToastEl.querySelectorAll<HTMLButtonElement>(".mirlo-toast-button");
+  downloadButton.textContent = chrome.i18n.getMessage("contentDownloadModel");
+  dismissButton.textContent = chrome.i18n.getMessage("contentNotNow");
+
+  // The click provides the transient user activation Chrome needs to download.
+  downloadButton.addEventListener("click", async () => {
+    downloadButton.disabled = true;
+    try {
+      await (self as any).Translator.create({
+        sourceLanguage: source,
+        targetLanguage: userTargetLanguage,
+        monitor(m: any) {
+          m.addEventListener("downloadprogress", (event: any) => {
+            const pct = Math.round((event?.loaded ?? 0) * 100);
+            downloadButton.textContent = chrome.i18n.getMessage("contentDownloading", [`${pct}%`]);
+          });
+        },
+      });
+      removeModelDownloadToast();
+      translateWordsOnPage();
+    } catch {
+      downloadButton.disabled = false;
+      downloadButton.textContent = chrome.i18n.getMessage("contentDownloadFailed");
+    }
+  });
+
+  dismissButton.addEventListener("click", () => removeModelDownloadToast());
+
+  document.body.appendChild(modelDownloadToastEl);
+  requestAnimationFrame(() => modelDownloadToastEl?.classList.add("is-visible"));
 }
 
 async function handleActivationFlow(): Promise<void> {
