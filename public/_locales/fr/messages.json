@@ -133,20 +133,12 @@
     "message": "Préférences linguistiques Mirlo",
     "description": "Aria label for the language preferences form"
   },
-  "optionsNativeLabel": {
-    "message": "Langue maternelle",
-    "description": "Label for native language select"
-  },
-  "optionsNativeHint": {
-    "message": "La langue que vous connaissez le mieux",
-    "description": "Hint for native language select"
-  },
   "optionsLearningLabel": {
-    "message": "Langue d'apprentissage",
+    "message": "Quelle langue voulez-vous apprendre ?",
     "description": "Label for learning language select"
   },
   "optionsLearningHint": {
-    "message": "La langue que vous souhaitez apprendre",
+    "message": "Sur toute page qui n'est pas dans cette langue, certains mots y sont traduits.",
     "description": "Hint for learning language select"
   },
   "optionsSaveBtn": {
@@ -168,10 +160,6 @@
   "optionsSaveStatusError": {
     "message": "Impossible d'enregistrer les paramètres.",
     "description": "Error message when saving fails"
-  },
-  "optionsErrorSameLang": {
-    "message": "La langue maternelle et la langue d'apprentissage doivent être différentes.",
-    "description": "Error when native and learning languages are the same"
   },
   "contentBadgeTitle": {
     "message": "Traduire avec Mirlo",
@@ -210,5 +198,9 @@
   "optionsLanguagesPoweredBy": {
     "message": "Langues fournies par la traduction intégrée et locale de Chrome.",
     "description": "Caption crediting Chrome built-in translation for the language list"
+  },
+  "popupLearningLabel": {
+    "message": "Apprentissage",
+    "description": "Label before the learning-language badge in the popup"
   }
 }

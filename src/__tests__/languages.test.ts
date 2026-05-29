@@ -5,7 +5,6 @@ import {
   isSupportedLanguage,
   getLanguageInfo,
   getLanguageLabel,
-  validateLanguagePair,
 } from "@/utils/languages";
 
 describe("SUPPORTED_LANGUAGES table", () => {
@@ -76,19 +75,5 @@ describe("getLanguageLabel", () => {
 
   it("falls back to the uppercased code for unknown languages", () => {
     expect(getLanguageLabel("xx")).toBe("XX");
-  });
-});
-
-describe("validateLanguagePair", () => {
-  it("accepts two different supported languages", () => {
-    expect(validateLanguagePair("en", "ja")).toEqual({ valid: true });
-  });
-
-  it("rejects a language paired with itself", () => {
-    expect(validateLanguagePair("en", "en")).toEqual({ valid: false, reason: "same" });
-  });
-
-  it("rejects an unsupported language", () => {
-    expect(validateLanguagePair("en", "xx")).toEqual({ valid: false, reason: "unsupported" });
   });
 });

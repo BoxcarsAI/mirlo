@@ -85,22 +85,3 @@ export function getLanguageLabel(code: string): string {
   if (info.native === info.english) return info.english;
   return `${info.english} — ${info.native}`;
 }
-
-export type LanguagePairProblem = "same" | "unsupported";
-
-/**
- * Validates a native/learning pair before saving. Returns a machine-readable
- * `reason` so the caller can map it to a localized message.
- */
-export function validateLanguagePair(
-  native: string,
-  learning: string,
-): { valid: boolean; reason?: LanguagePairProblem } {
-  if (!isSupportedLanguage(native) || !isSupportedLanguage(learning)) {
-    return { valid: false, reason: "unsupported" };
-  }
-  if (native === learning) {
-    return { valid: false, reason: "same" };
-  }
-  return { valid: true };
-}

@@ -10,7 +10,6 @@ const languageEl = document.getElementById("page-language")!;
 const domainEl = document.getElementById("site-domain")!;
 const siteStatusEl = document.getElementById("site-status")!;
 const toggleButton = document.getElementById("toggle-site") as HTMLButtonElement;
-const nativeLangEl = document.getElementById("native-lang")!;
 const learningLangEl = document.getElementById("learning-lang")!;
 const optionsLink = document.getElementById("open-options");
 
@@ -27,21 +26,15 @@ interface LanguageInfo {
   detectorError?: string | null;
 }
 
-function loadLanguagePreferences(): Promise<{ native: string; learning: string }> {
+function loadLanguagePreferences(): Promise<{ learning: string }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
-      resolve({ native: "en", learning: "es" });
+      resolve({ learning: "es" });
       return;
     }
-    chrome.storage.sync.get(
-      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
-      (result) => {
-        resolve({
-          native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
-          learning: result?.[STORAGE_KEYS.learningLanguage] || "es",
-        });
-      },
-    );
+    chrome.storage.sync.get([STORAGE_KEYS.learningLanguage], (result) => {
+      resolve({ learning: result?.[STORAGE_KEYS.learningLanguage] || "es" });
+    });
   });
 }
 
@@ -145,7 +138,6 @@ async function initializePopup(tab: chrome.tabs.Tab): Promise<void> {
   currentDomain = getDomainFromUrl(tab?.url);
 
   const languages = await loadLanguagePreferences();
-  if (nativeLangEl) nativeLangEl.textContent = getLanguageName(languages.native);
   if (learningLangEl) learningLangEl.textContent = getLanguageName(languages.learning);
 
   if (!currentDomain) {

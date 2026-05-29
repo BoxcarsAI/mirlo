@@ -18,20 +18,17 @@ export interface LanguagePair {
   targetLanguage: string;
 }
 
-export function getLanguagePairForPage(
-  userNativeLanguage: string,
-  userLearningLanguage: string,
-): LanguagePair | null {
-  if (userNativeLanguage === userLearningLanguage) return null;
+/**
+ * Mirlo translates toward a single target language (the language being
+ * learned). Any page that isn't already in the target gets translated into it,
+ * using the page's own language as the source. A page already in the target is
+ * left alone — there is nothing to learn from it.
+ */
+export function getLanguagePairForPage(targetLanguage: string): LanguagePair | null {
   const pageLanguage = getNormalizedPageLanguage();
   if (!pageLanguage) return null;
-  if (pageLanguage === userNativeLanguage) {
-    return { sourceLanguage: userNativeLanguage, targetLanguage: userLearningLanguage };
-  }
-  if (pageLanguage === userLearningLanguage) {
-    return { sourceLanguage: userLearningLanguage, targetLanguage: userNativeLanguage };
-  }
-  return null;
+  if (pageLanguage === targetLanguage) return null;
+  return { sourceLanguage: pageLanguage, targetLanguage };
 }
 
 export interface LanguageDetector {
@@ -43,11 +40,9 @@ const MIN_DETECT_CONFIDENCE = 0.5;
 
 export async function getLanguagePairForText(
   text: string,
-  userNativeLanguage: string,
-  userLearningLanguage: string,
+  targetLanguage: string,
   detector: LanguageDetector,
 ): Promise<LanguagePair | null> {
-  if (userNativeLanguage === userLearningLanguage) return null;
   if (!text || text.length < MIN_DETECT_TEXT_LENGTH) return null;
 
   let results: { detectedLanguage: string; confidence: number }[];
@@ -63,11 +58,6 @@ export async function getLanguagePairForText(
   if (top.confidence < MIN_DETECT_CONFIDENCE) return null;
 
   const detected = top.detectedLanguage;
-  if (detected === userNativeLanguage) {
-    return { sourceLanguage: userNativeLanguage, targetLanguage: userLearningLanguage };
-  }
-  if (detected === userLearningLanguage) {
-    return { sourceLanguage: userLearningLanguage, targetLanguage: userNativeLanguage };
-  }
-  return null;
+  if (detected === targetLanguage) return null;
+  return { sourceLanguage: detected, targetLanguage };
 }

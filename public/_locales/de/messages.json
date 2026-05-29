@@ -32,7 +32,7 @@
     "description": "Button text to disable the extension"
   },
   "popupChangeLanguages": {
-    "message": "Sprachen ändern →",
+    "message": "Sprache ändern →",
     "description": "Link to options page"
   },
   "popupAiStatusFormat": {
@@ -133,20 +133,12 @@
     "message": "Mirlo Spracheinstellungen",
     "description": "Aria label for the language preferences form"
   },
-  "optionsNativeLabel": {
-    "message": "Muttersprache",
-    "description": "Label for native language select"
-  },
-  "optionsNativeHint": {
-    "message": "Die Sprache, die Sie am besten beherrschen",
-    "description": "Hint for native language select"
-  },
   "optionsLearningLabel": {
-    "message": "Lernsprache",
+    "message": "Welche Sprache möchtest du lernen?",
     "description": "Label for learning language select"
   },
   "optionsLearningHint": {
-    "message": "Die Sprache, die Sie lernen möchten",
+    "message": "Auf jeder Seite, die nicht in dieser Sprache ist, werden einige Wörter dorthin übersetzt.",
     "description": "Hint for learning language select"
   },
   "optionsSaveBtn": {
@@ -168,10 +160,6 @@
   "optionsSaveStatusError": {
     "message": "Einstellungen konnten nicht gespeichert werden.",
     "description": "Error message when saving fails"
-  },
-  "optionsErrorSameLang": {
-    "message": "Mutter- und Lernsprache müssen unterschiedlich sein.",
-    "description": "Error when native and learning languages are the same"
   },
   "contentBadgeTitle": {
     "message": "Mit Mirlo übersetzen",
@@ -210,5 +198,9 @@
   "optionsLanguagesPoweredBy": {
     "message": "Sprachen bereitgestellt durch die in Chrome integrierte, lokale Übersetzung.",
     "description": "Caption crediting Chrome built-in translation for the language list"
+  },
+  "popupLearningLabel": {
+    "message": "Lernsprache",
+    "description": "Label before the learning-language badge in the popup"
   }
 }

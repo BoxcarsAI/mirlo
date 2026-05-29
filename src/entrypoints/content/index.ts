@@ -31,9 +31,8 @@ let listenersBound = false;
 let activationToastEl: HTMLDivElement | null = null;
 let activationDismissTimer: ReturnType<typeof setTimeout> | null = null;
 import { type TranslationDensity, DEFAULT_DENSITY } from "@/utils/storage-keys";
-let userNativeLanguage = "en";
 let userTranslationDensity: TranslationDensity = DEFAULT_DENSITY;
-let userLearningLanguage = "es";
+let userTargetLanguage = "es";
 const MARKER_TEXT = "\u00b7";
 let cachedDetector: LanguageDetector | null = null;
 
@@ -145,18 +144,17 @@ async function getPageLanguageInfo(): Promise<LanguageInfo> {
   };
 }
 
-async function getLanguagePreferences(): Promise<{ native: string; learning: string; density: TranslationDensity }> {
+async function getLanguagePreferences(): Promise<{ target: string; density: TranslationDensity }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
-      resolve({ native: "en", learning: "es", density: DEFAULT_DENSITY });
+      resolve({ target: "es", density: DEFAULT_DENSITY });
       return;
     }
     chrome.storage.sync.get(
-      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage, STORAGE_KEYS.translationDensity],
+      [STORAGE_KEYS.learningLanguage, STORAGE_KEYS.translationDensity],
       (result) => {
         resolve({
-          native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
-          learning: result?.[STORAGE_KEYS.learningLanguage] || "es",
+          target: result?.[STORAGE_KEYS.learningLanguage] || "es",
           density: (result?.[STORAGE_KEYS.translationDensity] as TranslationDensity) || DEFAULT_DENSITY,
         });
       },
@@ -166,8 +164,7 @@ async function getLanguagePreferences(): Promise<{ native: string; learning: str
 
 async function initializeLanguageSettings(): Promise<void> {
   const prefs = await getLanguagePreferences();
-  userNativeLanguage = prefs.native;
-  userLearningLanguage = prefs.learning;
+  userTargetLanguage = prefs.target;
   userTranslationDensity = prefs.density;
 }
 
@@ -279,12 +276,12 @@ async function translateWordsOnPage(): Promise<void> {
 
     const text = paragraph.innerText?.trim() || "";
     let languagePair = detector
-      ? await getLanguagePairForText(text, userNativeLanguage, userLearningLanguage, detector)
+      ? await getLanguagePairForText(text, userTargetLanguage, detector)
       : null;
 
     // Fall back to page-level detection
     if (!languagePair) {
-      languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+      languagePair = getLanguagePairForPage(userTargetLanguage);
     }
     if (!languagePair) continue;
 
@@ -372,10 +369,10 @@ async function translateParagraph(paragraph: HTMLParagraphElement): Promise<void
   const text = getParagraphText(paragraph);
   const detector = await getDetector();
   let languagePair = detector
-    ? await getLanguagePairForText(text, userNativeLanguage, userLearningLanguage, detector)
+    ? await getLanguagePairForText(text, userTargetLanguage, detector)
     : null;
   if (!languagePair) {
-    languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+    languagePair = getLanguagePairForPage(userTargetLanguage);
   }
   if (!languagePair) return;
   const { sourceLanguage, targetLanguage } = languagePair;
@@ -518,8 +515,8 @@ function showTooltip(paragraph: HTMLParagraphElement): void {
   const state = paragraph.dataset.mirloState || "translated";
   const original = paragraph.dataset.mirloOriginal || "";
   const translated = paragraph.dataset.mirloTranslated || "";
-  const sourceLang = paragraph.dataset.mirloSource || userNativeLanguage;
-  const targetLang = paragraph.dataset.mirloTarget || userLearningLanguage;
+  const sourceLang = paragraph.dataset.mirloSource || "";
+  const targetLang = paragraph.dataset.mirloTarget || userTargetLanguage;
 
   const nextLangName =
     state === "translated" ? getLanguageName(sourceLang) : getLanguageName(targetLang);
@@ -707,10 +704,8 @@ async function handleActivationFlow(): Promise<void> {
   const stored = await getStoredDomains();
   if (stored.enabled.includes(domain)) {
     const pageLanguage = getNormalizedPageLanguage();
-    if (pageLanguage !== userNativeLanguage && pageLanguage !== userLearningLanguage) {
-      console.log(
-        `Page language (${pageLanguage}) doesn't match native/learning (${userNativeLanguage}/${userLearningLanguage})`,
-      );
+    if (pageLanguage && pageLanguage === userTargetLanguage) {
+      console.log(`Page already in target language (${pageLanguage}); nothing to translate`);
       return;
     }
     activateMirlo();
@@ -719,7 +714,8 @@ async function handleActivationFlow(): Promise<void> {
   if (stored.dismissed.includes(domain)) return;
   if (!isArticleLike()) return;
   const pageLanguage = getNormalizedPageLanguage();
-  if (pageLanguage !== userNativeLanguage && pageLanguage !== userLearningLanguage) {
+  // Only prompt when we can see the page is in some other language than the target.
+  if (!pageLanguage || pageLanguage === userTargetLanguage) {
     return;
   }
   showActivationToast(domain);
