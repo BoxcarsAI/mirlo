@@ -178,6 +178,9 @@ toggleButton.addEventListener("click", async () => {
     currentTabId,
     { type: "mirlo:setActive", enabled: nextEnabled },
     () => {
+      // Reading lastError consumes it — the content script isn't present on
+      // every page (e.g. chrome:// pages), and that's expected, not an error.
+      void chrome.runtime.lastError;
       toggleButton.disabled = false;
     },
   );
