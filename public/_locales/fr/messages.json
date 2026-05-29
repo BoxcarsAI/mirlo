@@ -208,7 +208,7 @@
     "description": "Prefix before the Translator availability status"
   },
   "contentDownloadModelTitle": {
-    "message": "Téléchargez en_US.UTF-8$ pour traduire cette page (une seule fois).",
+    "message": "Mirlo a besoin d’un téléchargement unique pour traduire cette page en $LANG$.",
     "description": "Toast title offering a one-time model download",
     "placeholders": {
       "lang": {
@@ -221,7 +221,7 @@
     "description": "Button to start the model download"
   },
   "contentDownloading": {
-    "message": "Téléchargement… $",
+    "message": "Téléchargement… $PCT$",
     "description": "Download progress button label",
     "placeholders": {
       "pct": {
@@ -230,7 +230,7 @@
     }
   },
   "contentDownloadFailed": {
-    "message": "Échec du téléchargement — touchez pour réessayer",
+    "message": "Échec — touchez pour réessayer",
     "description": "Button label when the download failed"
   }
 }

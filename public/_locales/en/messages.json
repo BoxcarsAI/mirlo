@@ -208,7 +208,7 @@
     "description": "Prefix before the Translator availability status"
   },
   "contentDownloadModelTitle": {
-    "message": "Download en_US.UTF-8$ to translate this page (one-time).",
+    "message": "Mirlo needs a one-time download to translate this page into $LANG$.",
     "description": "Toast title offering a one-time model download",
     "placeholders": {
       "lang": {
@@ -221,7 +221,7 @@
     "description": "Button to start the model download"
   },
   "contentDownloading": {
-    "message": "Downloading… $",
+    "message": "Downloading… $PCT$",
     "description": "Download progress button label",
     "placeholders": {
       "pct": {
