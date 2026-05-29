@@ -81,39 +81,39 @@ describe("getLanguagePairForPage", () => {
     document.documentElement.removeAttribute("lang");
   });
 
-  it("returns native->learning when page matches native language", () => {
+  it("translates a non-target page into the target language", () => {
     document.documentElement.lang = "en";
-    const pair = getLanguagePairForPage("en", "es");
+    const pair = getLanguagePairForPage("es");
     expect(pair).toEqual({ sourceLanguage: "en", targetLanguage: "es" });
   });
 
-  it("returns learning->native when page matches learning language", () => {
-    document.documentElement.lang = "es";
-    const pair = getLanguagePairForPage("en", "es");
-    expect(pair).toEqual({ sourceLanguage: "es", targetLanguage: "en" });
+  it("works for any source language, not just a preconfigured pair", () => {
+    document.documentElement.lang = "de";
+    const pair = getLanguagePairForPage("hi");
+    expect(pair).toEqual({ sourceLanguage: "de", targetLanguage: "hi" });
   });
 
-  it("returns null when page language matches neither", () => {
-    document.documentElement.lang = "fr";
-    const pair = getLanguagePairForPage("en", "es");
+  it("returns null when the page is already in the target language", () => {
+    document.documentElement.lang = "es";
+    const pair = getLanguagePairForPage("es");
     expect(pair).toBeNull();
   });
 
   it("returns null when no page language is set", () => {
-    const pair = getLanguagePairForPage("en", "es");
+    const pair = getLanguagePairForPage("es");
     expect(pair).toBeNull();
   });
 
   it("normalizes BCP47 tags before comparison", () => {
     document.documentElement.lang = "en-US";
-    const pair = getLanguagePairForPage("en", "de");
+    const pair = getLanguagePairForPage("de");
     expect(pair).toEqual({ sourceLanguage: "en", targetLanguage: "de" });
   });
 
-  it("handles different language pairs", () => {
-    document.documentElement.lang = "fr";
-    const pair = getLanguagePairForPage("fr", "de");
-    expect(pair).toEqual({ sourceLanguage: "fr", targetLanguage: "de" });
+  it("treats a normalized page tag matching the target as already-target", () => {
+    document.documentElement.lang = "es-MX";
+    const pair = getLanguagePairForPage("es");
+    expect(pair).toBeNull();
   });
 });
 
@@ -124,32 +124,29 @@ function fakeDetector(lang: string, confidence = 0.95): LanguageDetector {
 }
 
 describe("getLanguagePairForText", () => {
-  it("detects native language text → translate to learning", async () => {
+  it("translates detected non-target text into the target language", async () => {
     const pair = await getLanguagePairForText(
       "The quick brown fox",
-      "en",
       "es",
       fakeDetector("en"),
     );
     expect(pair).toEqual({ sourceLanguage: "en", targetLanguage: "es" });
   });
 
-  it("detects learning language text → translate to native", async () => {
+  it("works for any detected source language", async () => {
     const pair = await getLanguagePairForText(
-      "El gato negro duerme",
-      "en",
-      "es",
-      fakeDetector("es"),
+      "Le petit chat dort tranquillement",
+      "hi",
+      fakeDetector("fr"),
     );
-    expect(pair).toEqual({ sourceLanguage: "es", targetLanguage: "en" });
+    expect(pair).toEqual({ sourceLanguage: "fr", targetLanguage: "hi" });
   });
 
-  it("returns null when detected language matches neither", async () => {
+  it("returns null when detected text is already in the target language", async () => {
     const pair = await getLanguagePairForText(
-      "Le petit chat dort",
-      "en",
+      "El gato negro duerme",
       "es",
-      fakeDetector("fr"),
+      fakeDetector("es"),
     );
     expect(pair).toBeNull();
   });
@@ -157,7 +154,6 @@ describe("getLanguagePairForText", () => {
   it("returns null when confidence is too low", async () => {
     const pair = await getLanguagePairForText(
       "ambiguous text",
-      "en",
       "es",
       fakeDetector("en", 0.3),
     );
@@ -166,7 +162,7 @@ describe("getLanguagePairForText", () => {
 
   it("returns null when detector returns empty results", async () => {
     const detector: LanguageDetector = { detect: async () => [] };
-    const pair = await getLanguagePairForText("some text", "en", "es", detector);
+    const pair = await getLanguagePairForText("some text", "es", detector);
     expect(pair).toBeNull();
   });
 
@@ -174,28 +170,26 @@ describe("getLanguagePairForText", () => {
     const detector: LanguageDetector = {
       detect: async () => { throw new Error("API error"); },
     };
-    const pair = await getLanguagePairForText("some text", "en", "es", detector);
+    const pair = await getLanguagePairForText("some text", "es", detector);
     expect(pair).toBeNull();
   });
 
   it("returns null when text is too short", async () => {
     const pair = await getLanguagePairForText(
       "hi",
-      "en",
       "es",
       fakeDetector("en"),
     );
     expect(pair).toBeNull();
   });
 
-  it("handles Reddit scenario: English page with Spanish content", async () => {
-    // Page says lang="en" but paragraph is actually Spanish
+  it("handles Reddit scenario: English page with Spanish content while learning Spanish", async () => {
+    // Page chrome is English but this paragraph is actually Spanish → already target, skip
     const pair = await getLanguagePairForText(
       "Hola amigos, estoy buscando recomendaciones para restaurantes en Granada",
-      "en",
       "es",
       fakeDetector("es", 0.97),
     );
-    expect(pair).toEqual({ sourceLanguage: "es", targetLanguage: "en" });
+    expect(pair).toBeNull();
   });
 });

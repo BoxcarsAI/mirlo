@@ -1,14 +1,9 @@
-const LANGUAGE_KEYS: Record<string, string> = {
-  en: "langEn",
-  es: "langEs",
-  fr: "langFr",
-  de: "langDe",
-};
+import { getLanguageInfo } from "@/utils/languages";
 
 export function getLanguageName(code: string): string {
-  const key = LANGUAGE_KEYS[code];
-  if (key) {
-    return chrome.i18n.getMessage(key);
+  const info = getLanguageInfo(code);
+  if (info) {
+    return info.english;
   }
   return code ? code.toUpperCase() : "";
 }

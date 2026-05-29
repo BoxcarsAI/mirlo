@@ -7,18 +7,13 @@ describe("chrome.storage integration", () => {
     fakeBrowser.reset();
   });
 
-  it("stores and retrieves language preferences", async () => {
+  it("stores and retrieves the learning language preference", async () => {
     await chrome.storage.sync.set({
-      [STORAGE_KEYS.nativeLanguage]: "fr",
       [STORAGE_KEYS.learningLanguage]: "de",
     });
 
-    const result = await chrome.storage.sync.get([
-      STORAGE_KEYS.nativeLanguage,
-      STORAGE_KEYS.learningLanguage,
-    ]);
+    const result = await chrome.storage.sync.get([STORAGE_KEYS.learningLanguage]);
 
-    expect(result[STORAGE_KEYS.nativeLanguage]).toBe("fr");
     expect(result[STORAGE_KEYS.learningLanguage]).toBe("de");
   });
 
@@ -33,18 +28,18 @@ describe("chrome.storage integration", () => {
   });
 
   it("returns empty object for missing keys", async () => {
-    const result = await chrome.storage.sync.get([STORAGE_KEYS.nativeLanguage]);
-    expect(result[STORAGE_KEYS.nativeLanguage]).toBeUndefined();
+    const result = await chrome.storage.sync.get([STORAGE_KEYS.learningLanguage]);
+    expect(result[STORAGE_KEYS.learningLanguage]).toBeUndefined();
   });
 
   it("reset clears all storage", async () => {
     await chrome.storage.sync.set({
-      [STORAGE_KEYS.nativeLanguage]: "es",
+      [STORAGE_KEYS.learningLanguage]: "es",
     });
 
     fakeBrowser.reset();
 
-    const result = await chrome.storage.sync.get([STORAGE_KEYS.nativeLanguage]);
-    expect(result[STORAGE_KEYS.nativeLanguage]).toBeUndefined();
+    const result = await chrome.storage.sync.get([STORAGE_KEYS.learningLanguage]);
+    expect(result[STORAGE_KEYS.learningLanguage]).toBeUndefined();
   });
 });

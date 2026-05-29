@@ -10,7 +10,6 @@ const languageEl = document.getElementById("page-language")!;
 const domainEl = document.getElementById("site-domain")!;
 const siteStatusEl = document.getElementById("site-status")!;
 const toggleButton = document.getElementById("toggle-site") as HTMLButtonElement;
-const nativeLangEl = document.getElementById("native-lang")!;
 const learningLangEl = document.getElementById("learning-lang")!;
 const optionsLink = document.getElementById("open-options");
 
@@ -21,27 +20,22 @@ let currentTabId: number | null = null;
 interface LanguageInfo {
   htmlLang?: string;
   translationSupported?: boolean;
+  translationAvailability?: string;
   detectorSupported?: boolean;
   detectorAvailability?: string;
   detectorResult?: { detectedLanguage: string; confidence: number } | null;
   detectorError?: string | null;
 }
 
-function loadLanguagePreferences(): Promise<{ native: string; learning: string }> {
+function loadLanguagePreferences(): Promise<{ learning: string }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
-      resolve({ native: "en", learning: "es" });
+      resolve({ learning: "es" });
       return;
     }
-    chrome.storage.sync.get(
-      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage],
-      (result) => {
-        resolve({
-          native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
-          learning: result?.[STORAGE_KEYS.learningLanguage] || "es",
-        });
-      },
-    );
+    chrome.storage.sync.get([STORAGE_KEYS.learningLanguage], (result) => {
+      resolve({ learning: result?.[STORAGE_KEYS.learningLanguage] || "es" });
+    });
   });
 }
 
@@ -62,9 +56,9 @@ function formatAiStatus(info: LanguageInfo | null): string {
   const detector = info.detectorSupported
     ? `${detectorPrefix} ${info.detectorAvailability}`
     : chrome.i18n.getMessage("popupDetectorUnsupported");
-  const translation = info.translationSupported
-    ? chrome.i18n.getMessage("popupTranslationSupported")
-    : chrome.i18n.getMessage("popupTranslationUnsupported");
+  const translation = !info.translationSupported
+    ? chrome.i18n.getMessage("popupTranslationUnsupported")
+    : `${chrome.i18n.getMessage("popupTranslationPrefix")} ${info.translationAvailability ?? "unknown"}`;
   return `${detector}; ${translation}`;
 }
 
@@ -145,7 +139,6 @@ async function initializePopup(tab: chrome.tabs.Tab): Promise<void> {
   currentDomain = getDomainFromUrl(tab?.url);
 
   const languages = await loadLanguagePreferences();
-  if (nativeLangEl) nativeLangEl.textContent = getLanguageName(languages.native);
   if (learningLangEl) learningLangEl.textContent = getLanguageName(languages.learning);
 
   if (!currentDomain) {
@@ -186,6 +179,9 @@ toggleButton.addEventListener("click", async () => {
     currentTabId,
     { type: "mirlo:setActive", enabled: nextEnabled },
     () => {
+      // Reading lastError consumes it — the content script isn't present on
+      // every page (e.g. chrome:// pages), and that's expected, not an error.
+      void chrome.runtime.lastError;
       toggleButton.disabled = false;
     },
   );

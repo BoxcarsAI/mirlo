@@ -30,10 +30,10 @@ let mirloActive = false;
 let listenersBound = false;
 let activationToastEl: HTMLDivElement | null = null;
 let activationDismissTimer: ReturnType<typeof setTimeout> | null = null;
+let modelDownloadToastEl: HTMLDivElement | null = null;
 import { type TranslationDensity, DEFAULT_DENSITY } from "@/utils/storage-keys";
-let userNativeLanguage = "en";
 let userTranslationDensity: TranslationDensity = DEFAULT_DENSITY;
-let userLearningLanguage = "es";
+let userTargetLanguage = "es";
 const MARKER_TEXT = "\u00b7";
 let cachedDetector: LanguageDetector | null = null;
 
@@ -53,6 +53,7 @@ async function getDetector(): Promise<LanguageDetector | null> {
 interface LanguageInfo {
   htmlLang: string;
   translationSupported: boolean;
+  translationAvailability: string;
   detectorSupported: boolean;
   detectorAvailability: string;
   detectorResult: { detectedLanguage: string; confidence: number } | null;
@@ -96,7 +97,7 @@ function collectSampleText(limit = 2000): string {
 
 async function getPageLanguageInfo(): Promise<LanguageInfo> {
   const htmlLang = getHtmlLanguage();
-  const translationSupported = typeof (window as any).translation !== "undefined";
+  const translationSupported = "Translator" in self;
   const detectorSupported = "LanguageDetector" in self;
   const userActivation = {
     isActive: Boolean((document as any).userActivation?.isActive),
@@ -134,9 +135,31 @@ async function getPageLanguageInfo(): Promise<LanguageInfo> {
     }
   }
 
+  // Report the real Translator availability for the pair this page would use:
+  // detected (or declared) source language → the language being learned.
+  let translationAvailability = translationSupported ? "unknown" : "unsupported";
+  if (translationSupported) {
+    const sourceLanguage = detectorResult?.detectedLanguage || getNormalizedPageLanguage();
+    if (!sourceLanguage) {
+      translationAvailability = "no-source-language";
+    } else if (sourceLanguage === userTargetLanguage) {
+      translationAvailability = "already-target";
+    } else {
+      try {
+        translationAvailability = await (self as any).Translator.availability({
+          sourceLanguage,
+          targetLanguage: userTargetLanguage,
+        });
+      } catch (error: any) {
+        translationAvailability = error?.name || "availability-error";
+      }
+    }
+  }
+
   return {
     htmlLang,
     translationSupported,
+    translationAvailability,
     detectorSupported,
     detectorAvailability,
     detectorResult,
@@ -145,18 +168,17 @@ async function getPageLanguageInfo(): Promise<LanguageInfo> {
   };
 }
 
-async function getLanguagePreferences(): Promise<{ native: string; learning: string; density: TranslationDensity }> {
+async function getLanguagePreferences(): Promise<{ target: string; density: TranslationDensity }> {
   return new Promise((resolve) => {
     if (!chrome?.storage?.sync) {
-      resolve({ native: "en", learning: "es", density: DEFAULT_DENSITY });
+      resolve({ target: "es", density: DEFAULT_DENSITY });
       return;
     }
     chrome.storage.sync.get(
-      [STORAGE_KEYS.nativeLanguage, STORAGE_KEYS.learningLanguage, STORAGE_KEYS.translationDensity],
+      [STORAGE_KEYS.learningLanguage, STORAGE_KEYS.translationDensity],
       (result) => {
         resolve({
-          native: result?.[STORAGE_KEYS.nativeLanguage] || "en",
-          learning: result?.[STORAGE_KEYS.learningLanguage] || "es",
+          target: result?.[STORAGE_KEYS.learningLanguage] || "es",
           density: (result?.[STORAGE_KEYS.translationDensity] as TranslationDensity) || DEFAULT_DENSITY,
         });
       },
@@ -166,8 +188,7 @@ async function getLanguagePreferences(): Promise<{ native: string; learning: str
 
 async function initializeLanguageSettings(): Promise<void> {
   const prefs = await getLanguagePreferences();
-  userNativeLanguage = prefs.native;
-  userLearningLanguage = prefs.learning;
+  userTargetLanguage = prefs.target;
   userTranslationDensity = prefs.density;
 }
 
@@ -270,6 +291,15 @@ async function getOrCreateTranslator(
 async function translateWordsOnPage(): Promise<void> {
   if (!("Translator" in self)) return;
 
+  // A not-yet-downloaded model can only be fetched under a user gesture, which
+  // the automatic page-load path doesn't have. If the page's pair needs a
+  // download, prompt for it instead of silently failing.
+  const pending = await getPagePairAvailability();
+  if (pending && (pending.availability === "downloadable" || pending.availability === "downloading")) {
+    showModelDownloadToast(pending.source);
+    return;
+  }
+
   const detector = await getDetector();
   const translatorCache = new Map<string, any>();
 
@@ -279,12 +309,12 @@ async function translateWordsOnPage(): Promise<void> {
 
     const text = paragraph.innerText?.trim() || "";
     let languagePair = detector
-      ? await getLanguagePairForText(text, userNativeLanguage, userLearningLanguage, detector)
+      ? await getLanguagePairForText(text, userTargetLanguage, detector)
       : null;
 
     // Fall back to page-level detection
     if (!languagePair) {
-      languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+      languagePair = getLanguagePairForPage(userTargetLanguage);
     }
     if (!languagePair) continue;
 
@@ -372,10 +402,10 @@ async function translateParagraph(paragraph: HTMLParagraphElement): Promise<void
   const text = getParagraphText(paragraph);
   const detector = await getDetector();
   let languagePair = detector
-    ? await getLanguagePairForText(text, userNativeLanguage, userLearningLanguage, detector)
+    ? await getLanguagePairForText(text, userTargetLanguage, detector)
     : null;
   if (!languagePair) {
-    languagePair = getLanguagePairForPage(userNativeLanguage, userLearningLanguage);
+    languagePair = getLanguagePairForPage(userTargetLanguage);
   }
   if (!languagePair) return;
   const { sourceLanguage, targetLanguage } = languagePair;
@@ -518,8 +548,8 @@ function showTooltip(paragraph: HTMLParagraphElement): void {
   const state = paragraph.dataset.mirloState || "translated";
   const original = paragraph.dataset.mirloOriginal || "";
   const translated = paragraph.dataset.mirloTranslated || "";
-  const sourceLang = paragraph.dataset.mirloSource || userNativeLanguage;
-  const targetLang = paragraph.dataset.mirloTarget || userLearningLanguage;
+  const sourceLang = paragraph.dataset.mirloSource || "";
+  const targetLang = paragraph.dataset.mirloTarget || userTargetLanguage;
 
   const nextLangName =
     state === "translated" ? getLanguageName(sourceLang) : getLanguageName(targetLang);
@@ -700,6 +730,101 @@ function showActivationToast(domain: string): void {
   }, TOAST_AUTO_DISMISS_MS);
 }
 
+/**
+ * Determines the source→target pair this page would use and asks Chrome whether
+ * its on-device model is ready. Source is the detected page language (falling
+ * back to the declared lang). Returns null when there is nothing to translate.
+ */
+async function getPagePairAvailability(): Promise<{ source: string; availability: string } | null> {
+  if (!("Translator" in self)) return null;
+  let source = getNormalizedPageLanguage();
+  const detector = await getDetector();
+  if (detector) {
+    const sample = collectSampleText();
+    if (sample.length >= 20) {
+      try {
+        const results = await detector.detect(sample);
+        if (results?.[0] && results[0].confidence >= 0.5) {
+          source = results[0].detectedLanguage;
+        }
+      } catch {
+        // fall back to declared page language
+      }
+    }
+  }
+  if (!source || source === userTargetLanguage) return null;
+  try {
+    const availability = await (self as any).Translator.availability({
+      sourceLanguage: source,
+      targetLanguage: userTargetLanguage,
+    });
+    return { source, availability };
+  } catch {
+    return null;
+  }
+}
+
+function removeModelDownloadToast(): void {
+  if (!modelDownloadToastEl) return;
+  modelDownloadToastEl.classList.remove("is-visible");
+  modelDownloadToastEl.classList.add("is-hiding");
+  const el = modelDownloadToastEl;
+  modelDownloadToastEl = null;
+  setTimeout(() => el.remove(), 200);
+}
+
+function showModelDownloadToast(source: string): void {
+  if (modelDownloadToastEl) return;
+  const langName = getLanguageName(userTargetLanguage);
+  modelDownloadToastEl = document.createElement("div");
+  modelDownloadToastEl.className = "mirlo-toast";
+  modelDownloadToastEl.innerHTML = `
+    <div class="mirlo-toast-icon">⬇️</div>
+    <div class="mirlo-toast-content">
+      <div class="mirlo-toast-title"></div>
+      <div class="mirlo-toast-actions">
+        <button class="mirlo-toast-button is-primary" type="button"></button>
+        <button class="mirlo-toast-button" type="button"></button>
+      </div>
+    </div>
+  `;
+
+  const titleEl = modelDownloadToastEl.querySelector(".mirlo-toast-title")!;
+  titleEl.textContent = chrome.i18n.getMessage("contentDownloadModelTitle", [langName]);
+
+  const [downloadButton, dismissButton] =
+    modelDownloadToastEl.querySelectorAll<HTMLButtonElement>(".mirlo-toast-button");
+  downloadButton.textContent = chrome.i18n.getMessage("contentDownloadModel");
+  dismissButton.textContent = chrome.i18n.getMessage("contentNotNow");
+
+  // The click provides the transient user activation Chrome needs to download.
+  downloadButton.addEventListener("click", async () => {
+    downloadButton.disabled = true;
+    try {
+      await (self as any).Translator.create({
+        sourceLanguage: source,
+        targetLanguage: userTargetLanguage,
+        monitor(m: any) {
+          m.addEventListener("downloadprogress", (event: any) => {
+            const pct = Math.round((event?.loaded ?? 0) * 100);
+            downloadButton.textContent = chrome.i18n.getMessage("contentDownloading", [`${pct}%`]);
+          });
+        },
+      });
+      removeModelDownloadToast();
+      translateWordsOnPage();
+    } catch {
+      downloadButton.disabled = false;
+      downloadButton.textContent = chrome.i18n.getMessage("contentDownloadFailed");
+    }
+  });
+
+  dismissButton.addEventListener("click", () => removeModelDownloadToast());
+
+  document.body.appendChild(modelDownloadToastEl);
+  requestAnimationFrame(() => modelDownloadToastEl?.classList.add("is-visible"));
+}
+
 async function handleActivationFlow(): Promise<void> {
   await initializeLanguageSettings();
   const domain = normalizeDomain(location.hostname);
@@ -707,10 +832,8 @@ async function handleActivationFlow(): Promise<void> {
   const stored = await getStoredDomains();
   if (stored.enabled.includes(domain)) {
     const pageLanguage = getNormalizedPageLanguage();
-    if (pageLanguage !== userNativeLanguage && pageLanguage !== userLearningLanguage) {
-      console.log(
-        `Page language (${pageLanguage}) doesn't match native/learning (${userNativeLanguage}/${userLearningLanguage})`,
-      );
+    if (pageLanguage && pageLanguage === userTargetLanguage) {
+      console.log(`Page already in target language (${pageLanguage}); nothing to translate`);
       return;
     }
     activateMirlo();
@@ -719,7 +842,8 @@ async function handleActivationFlow(): Promise<void> {
   if (stored.dismissed.includes(domain)) return;
   if (!isArticleLike()) return;
   const pageLanguage = getNormalizedPageLanguage();
-  if (pageLanguage !== userNativeLanguage && pageLanguage !== userLearningLanguage) {
+  // Only prompt when we can see the page is in some other language than the target.
+  if (!pageLanguage || pageLanguage === userTargetLanguage) {
     return;
   }
   showActivationToast(domain);

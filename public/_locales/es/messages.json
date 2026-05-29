@@ -32,7 +32,7 @@
     "description": "Button text to disable the extension"
   },
   "popupChangeLanguages": {
-    "message": "Cambiar idiomas →",
+    "message": "Cambiar idioma →",
     "description": "Link to options page"
   },
   "popupAiStatusFormat": {
@@ -133,20 +133,12 @@
     "message": "Preferencias de idioma de Mirlo",
     "description": "Aria label for the language preferences form"
   },
-  "optionsNativeLabel": {
-    "message": "Idioma nativo",
-    "description": "Label for native language select"
-  },
-  "optionsNativeHint": {
-    "message": "El idioma que mejor conoces",
-    "description": "Hint for native language select"
-  },
   "optionsLearningLabel": {
-    "message": "Idioma de aprendizaje",
+    "message": "¿Qué idioma quieres aprender?",
     "description": "Label for learning language select"
   },
   "optionsLearningHint": {
-    "message": "El idioma que quieres aprender",
+    "message": "En cualquier página que no esté en este idioma, algunas palabras se traducen a él.",
     "description": "Hint for learning language select"
   },
   "optionsSaveBtn": {
@@ -168,26 +160,6 @@
   "optionsSaveStatusError": {
     "message": "No se han podido guardar los ajustes.",
     "description": "Error message when saving fails"
-  },
-  "optionsErrorSameLang": {
-    "message": "El idioma nativo y el de aprendizaje deben ser diferentes.",
-    "description": "Error when native and learning languages are the same"
-  },
-  "langEnFull": {
-    "message": "🇬🇧 Inglés",
-    "description": "English with flag"
-  },
-  "langEsFull": {
-    "message": "🇪🇸 Español",
-    "description": "Spanish with flag"
-  },
-  "langFrFull": {
-    "message": "🇫🇷 Francés",
-    "description": "French with flag"
-  },
-  "langDeFull": {
-    "message": "🇩🇪 Alemán",
-    "description": "German with flag"
   },
   "contentBadgeTitle": {
     "message": "Traducir con Mirlo",
@@ -218,5 +190,47 @@
   "contentNotNow": {
     "message": "Ahora no",
     "description": "Button to dismiss enable toast"
+  },
+  "optionsErrorUnsupportedLang": {
+    "message": "Ese par de idiomas no es compatible.",
+    "description": "Error when a selected language pair is not supported"
+  },
+  "optionsLanguagesPoweredBy": {
+    "message": "Idiomas proporcionados por la traducción integrada y local de Chrome.",
+    "description": "Caption crediting Chrome built-in translation for the language list"
+  },
+  "popupLearningLabel": {
+    "message": "Aprendiendo",
+    "description": "Label before the learning-language badge in the popup"
+  },
+  "popupTranslationPrefix": {
+    "message": "Traductor",
+    "description": "Prefix before the Translator availability status"
+  },
+  "contentDownloadModelTitle": {
+    "message": "Mirlo necesita una descarga única para traducir esta página al $LANG$.",
+    "description": "Toast title offering a one-time model download",
+    "placeholders": {
+      "lang": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentDownloadModel": {
+    "message": "Descargar",
+    "description": "Button to start the model download"
+  },
+  "contentDownloading": {
+    "message": "Descargando… $PCT$",
+    "description": "Download progress button label",
+    "placeholders": {
+      "pct": {
+        "content": "$1"
+      }
+    }
+  },
+  "contentDownloadFailed": {
+    "message": "Error al descargar — toca para reintentar",
+    "description": "Button label when the download failed"
   }
 }
